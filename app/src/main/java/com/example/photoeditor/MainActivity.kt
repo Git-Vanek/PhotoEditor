@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
         var sp: SharedPreferences =getSharedPreferences(MY_SETTINGS, Context.MODE_PRIVATE)
-        var hasVisited:Boolean=sp.getBoolean("hasVisited", false)
+
 
     }
 }
