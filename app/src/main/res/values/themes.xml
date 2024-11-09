@@ -5,5 +5,9 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
+    <style name="LaunchScreen" parent="Base.Theme.PhotoEditor">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
     <style name="Theme.PhotoEditor" parent="Base.Theme.PhotoEditor" />
 </resources>
