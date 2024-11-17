@@ -1,6 +1,7 @@
 package com.example.photoeditor
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import com.example.photoeditor.databinding.ActivityMainBinding
@@ -130,12 +131,18 @@ class MainActivity : AppCompatActivity() {
 
     // Метод для отображения информации пользователя
     private fun userInfo() {
-
+        // Создание Intent для перехода на UserInfoActivity
+        val intent = Intent(this, MainActivity::class.java)
+        // Запуск UserInfoActivity
+        startActivity(intent)
     }
 
     // Метод для отображения настроек
     private fun settings() {
-
+        // Создание Intent для перехода на MainActivity
+        val intent = Intent(this, MainActivity::class.java)
+        // Запуск MainActivity
+        startActivity(intent)
     }
 
     // Метод для добавления элемента

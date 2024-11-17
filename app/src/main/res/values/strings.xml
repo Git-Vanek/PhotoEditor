@@ -9,4 +9,6 @@
     <string name="add">Add</string>
     <string name="load">Load</string>
     <string name="delete">Delete</string>
+    <string name="logout">Logout</string>
+    <string name="created_at">Created at</string>
 </resources>
