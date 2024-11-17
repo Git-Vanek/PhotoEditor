@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         // Установка макета активности
         setContentView(binding.root)
+        // Установка Toolbar как ActionBar
+        setSupportActionBar(binding.toolbar)
 
         // Настройка SearchView
         val searchView: SearchView = findViewById(R.id.searchView)

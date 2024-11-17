@@ -13,4 +13,7 @@
     <string name="created_at">Created at</string>
     <string name="image_format">Image format</string>
     <string name="save">Save</string>
+    <string name="draw">Draw</string>
+    <string name="filter">Filter</string>
+    <string name="edit">Edit</string>
 </resources>

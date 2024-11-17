@@ -15,5 +15,6 @@ class PhotoActivity : AppCompatActivity() {
         // Получение объекта Photo из Intent
         val photo = intent.getSerializableExtra("photo") as Photo
 
+
     }
 }

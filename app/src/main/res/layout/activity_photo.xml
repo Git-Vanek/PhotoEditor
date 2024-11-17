@@ -40,6 +40,11 @@
             android:layout_weight="1"
             android:padding="16dp">
 
+            <com.github.chrisbanes.photoview.PhotoView
+                android:id="@+id/photoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
         </LinearLayout>
 
         <!-- Нижняя панель с кнопками "Рисовать", "Фильтр" и "Изменить" -->
@@ -55,7 +60,7 @@
                 android:id="@+id/buttonDraw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Draw"
+                android:text="@string/draw"
                 android:layout_marginEnd="16dp" />
 
             <!-- Кнопка "Фильтр" -->
@@ -63,7 +68,7 @@
                 android:id="@+id/buttonilter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Filter"
+                android:text="@string/filter"
                 android:layout_marginEnd="16dp" />
 
             <!-- Кнопка "Изменить" -->
@@ -71,7 +76,7 @@
                 android:id="@+id/buttonEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Edit"
+                android:text="@string/edit"
                 android:layout_marginEnd="16dp" />
         </LinearLayout>
     </LinearLayout>

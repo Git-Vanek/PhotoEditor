@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
