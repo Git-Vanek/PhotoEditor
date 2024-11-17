@@ -3,4 +3,8 @@
     <string name="app_name">PhotoEditor</string>
     <string name="signin">Войти</string>
     <string name="signup">Регистрация</string>
+    <string name="back">Назад</string>
+    <string name="password">Пароль</string>
+    <string name="email">Почта</string>
+    <string name="username">Имя пользователя</string>
 </resources>

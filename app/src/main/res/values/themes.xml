@@ -1,8 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.PhotoEditor" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Основные цвета -->
+        <item name="colorPrimary">@color/primary</item>
+        <!-- Стили кнопок -->
+        <item name="materialButtonStyle">@style/Widget.PhotoEditor.Button</item>
     </style>
 
     <style name="LaunchScreen" parent="Base.Theme.PhotoEditor">

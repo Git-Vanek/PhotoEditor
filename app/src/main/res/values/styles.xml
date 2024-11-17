@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- Стиль кнопок -->
+    <style name="Widget.PhotoEditor.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/onPrimary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+</resources>
