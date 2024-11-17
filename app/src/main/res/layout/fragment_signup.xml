@@ -96,7 +96,7 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/buttonSignIn"
+            android:id="@+id/buttonSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/signup"
@@ -104,7 +104,7 @@
             android:layout_marginBottom="12dp"/>
 
         <Button
-            android:id="@+id/buttonSignUp"
+            android:id="@+id/buttonBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/back"
