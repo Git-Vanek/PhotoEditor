@@ -9,14 +9,19 @@ import com.example.photoeditor.databinding.ActivityUserInfoBinding
 import java.time.LocalDate
 
 class UserInfoActivity : AppCompatActivity() {
+    // Инициализация переменной для View Binding
     private lateinit var binding: ActivityUserInfoBinding
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Установка темы для активности
+        setTheme(R.style.Theme_PhotoEditor)
         super.onCreate(savedInstanceState)
-        binding = ActivityUserInfoBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
+        // Инициализация View Binding
+        binding = ActivityUserInfoBinding.inflate(layoutInflater)
+        // Установка макета активности
+        setContentView(binding.root)
         // Установка Toolbar как ActionBar
         setSupportActionBar(binding.toolbar)
 

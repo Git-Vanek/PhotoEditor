@@ -10,16 +10,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.photoeditor.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
+    // Инициализация переменной для View Binding
     private lateinit var binding: ActivitySettingsBinding
     // Ключ для SharedPreferences
     private val MY_SETTINGS: String = "my_settings"
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Установка темы для активности
+        setTheme(R.style.Theme_PhotoEditor)
         super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
+        // Инициализация View Binding
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        // Установка макета активности
+        setContentView(binding.root)
         // Установка Toolbar как ActionBar
         setSupportActionBar(binding.toolbar)
 
