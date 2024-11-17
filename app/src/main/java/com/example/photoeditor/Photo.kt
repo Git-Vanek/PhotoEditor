@@ -1,5 +1,6 @@
 package com.example.photoeditor
 
+import java.io.Serializable
 import java.time.LocalDate
 
 data class Photo(
@@ -9,4 +10,4 @@ data class Photo(
     val original: Boolean,
     val path: String,
     val createdAt: LocalDate
-)
+) : Serializable

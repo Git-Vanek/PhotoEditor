@@ -7,7 +7,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-class PhotoAdapter(private var dataset: List<Photo>) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
+class PhotoAdapter(private var dataset: List<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
 
     // Класс ViewHolder для хранения ссылок на элементы интерфейса
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -36,6 +36,9 @@ class PhotoAdapter(private var dataset: List<Photo>) : RecyclerView.Adapter<Phot
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(viewHolder.image)
+        }
+        viewHolder.itemView.setOnClickListener {
+            itemClickListener(dataset[position])
         }
     }
 

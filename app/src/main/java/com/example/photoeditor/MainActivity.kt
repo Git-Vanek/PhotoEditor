@@ -61,7 +61,9 @@ class MainActivity : AppCompatActivity() {
         // Инициализация RecyclerView
         val rv: RecyclerView = binding.recyclerView
         photoList = buildPhotoList()
-        photoAdapter = PhotoAdapter(photoList)
+        photoAdapter = PhotoAdapter(photoList) { photo ->
+            openPhotoActivity(photo)
+        }
         rv.adapter = photoAdapter
         rv.layoutManager = GridLayoutManager(this, 3) // 3 элемента в строке
 
@@ -143,6 +145,13 @@ class MainActivity : AppCompatActivity() {
         // Создание Intent для перехода на SettingsActivity
         val intent = Intent(this, SettingsActivity::class.java)
         // Запуск SettingsActivity
+        startActivity(intent)
+    }
+
+    // Метод для перехода на редактирование элемента
+    private fun openPhotoActivity(photo: Photo) {
+        val intent = Intent(this, PhotoActivity::class.java)
+        intent.putExtra("photo", photo)
         startActivity(intent)
     }
 
