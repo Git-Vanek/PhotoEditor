@@ -6,17 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".SignupFragment">
 
+    <!-- Основной контейнер для элементов интерфейса -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Контейнер для поля ввода имени пользователя -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:orientation="horizontal">
 
+            <!-- Иконка для поля ввода имени пользователя -->
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="50dp"
@@ -24,8 +27,9 @@
                 app:srcCompat="@android:drawable/ic_menu_my_calendar"
                 android:contentDescription="@string/username" />
 
+            <!-- Поле ввода имени пользователя -->
             <EditText
-                android:id="@+id/editUrername"
+                android:id="@+id/editUsername"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -35,15 +39,16 @@
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:autofillHints="" />
-
         </LinearLayout>
 
+        <!-- Контейнер для поля ввода email -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:orientation="horizontal">
 
+            <!-- Иконка для поля ввода email -->
             <ImageView
                 android:id="@+id/imageView2"
                 android:layout_width="50dp"
@@ -51,6 +56,7 @@
                 app:srcCompat="@android:drawable/ic_menu_mapmode"
                 android:contentDescription="@string/email" />
 
+            <!-- Поле ввода email -->
             <EditText
                 android:id="@+id/editEmail"
                 android:layout_width="0dp"
@@ -62,9 +68,9 @@
                 android:inputType="textEmailAddress"
                 android:minHeight="48dp"
                 android:autofillHints="" />
-
         </LinearLayout>
 
+        <!-- Контейнер для поля ввода пароля -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,6 +80,7 @@
             android:layout_marginBottom="24dp"
             android:orientation="horizontal">
 
+            <!-- Иконка для поля ввода пароля -->
             <ImageView
                 android:id="@+id/imageView3"
                 android:layout_width="50dp"
@@ -81,6 +88,7 @@
                 app:srcCompat="@android:drawable/ic_menu_edit"
                 android:contentDescription="@string/password" />
 
+            <!-- Поле ввода пароля -->
             <EditText
                 android:id="@+id/editPassword"
                 android:layout_width="0dp"
@@ -92,9 +100,9 @@
                 android:inputType="textPassword"
                 android:minHeight="48dp"
                 android:autofillHints="" />
-
         </LinearLayout>
 
+        <!-- Кнопка для регистрации -->
         <Button
             android:id="@+id/buttonSignUp"
             android:layout_width="wrap_content"
@@ -103,6 +111,7 @@
             android:layout_gravity="center"
             android:layout_marginBottom="12dp"/>
 
+        <!-- Кнопка для возврата -->
         <Button
             android:id="@+id/buttonBack"
             android:layout_width="wrap_content"
