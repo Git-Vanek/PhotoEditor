@@ -70,7 +70,7 @@
             android:padding="16dp"
             android:clipToPadding="false" />
 
-        <!-- Нижняя панель с кнопками "Добавить" и "Удалить" -->
+        <!-- Нижняя панель с кнопками "Добавить", "Загрузить" и "Удалить" -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -83,7 +83,15 @@
                 android:id="@+id/buttonAdd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add"
+                android:text="@string/add"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Кнопка "Загрузить" -->
+            <Button
+                android:id="@+id/buttonLoad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/load"
                 android:layout_marginEnd="16dp" />
 
             <!-- Кнопка "Удалить" -->
@@ -91,7 +99,7 @@
                 android:id="@+id/buttonDelete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete" />
+                android:text="@string/delete" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

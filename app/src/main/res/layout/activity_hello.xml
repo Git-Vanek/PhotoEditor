@@ -24,7 +24,7 @@
                 android:id="@+id/imageLogo"
                 android:layout_width="160dp"
                 android:layout_height="160dp"
-                app:srcCompat="@drawable/ic_launcher_foreground" />
+                app:srcCompat="@drawable/logo" />
 
             <TextView
                 android:id="@+id/textView"
