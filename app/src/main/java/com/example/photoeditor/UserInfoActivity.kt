@@ -28,15 +28,23 @@ class UserInfoActivity : AppCompatActivity() {
         binding.textViewEmail.text = user.email
         binding.textViewCreatedAt.text = user.createdAt.toString()
 
-        // Установка обработчика нажатия для кнопки выхода
-        binding.buttonLogout.setOnClickListener {
-            logout()
-        }
-
         // Установка обработчика нажатия для кнопки "Назад"
         binding.buttonBack.setOnClickListener {
             back()
         }
+
+        // Установка обработчика нажатия для кнопки выхода
+        binding.buttonLogout.setOnClickListener {
+            logout()
+        }
+    }
+
+    // Функция для обработки возврата
+    private fun back() {
+        // Создание Intent для перехода на MainActivity
+        val intent = Intent(this, MainActivity::class.java)
+        // Переход на MainActivity
+        startActivity(intent)
     }
 
     // Функция для обработки выхода
@@ -44,14 +52,6 @@ class UserInfoActivity : AppCompatActivity() {
         // Создание Intent для перехода на HelloActivity
         val intent = Intent(this, HelloActivity::class.java)
         // Переход на HelloActivity
-        startActivity(intent)
-    }
-
-    // Функция для обработки возврата
-    private fun back() {
-        // Создание Intent для перехода на MainActivity
-        val intent = Intent(this, HelloActivity::class.java)
-        // Переход на MainActivity
         startActivity(intent)
     }
 }

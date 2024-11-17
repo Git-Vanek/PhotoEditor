@@ -11,4 +11,6 @@
     <string name="delete">Delete</string>
     <string name="logout">Logout</string>
     <string name="created_at">Created at</string>
+    <string name="image_format">Image format</string>
+    <string name="save">Save</string>
 </resources>

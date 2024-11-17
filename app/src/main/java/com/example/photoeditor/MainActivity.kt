@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     // Ключ для SharedPreferences
     private val MY_SETTINGS: String = "my_settings"
+    private lateinit var sharedPreferences: SharedPreferences
 
     // Список фотографий
     private lateinit var photoList: List<Photo>
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Получение экземпляра SharedPreferences
-        val sp: SharedPreferences = getSharedPreferences(MY_SETTINGS, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(MY_SETTINGS, Context.MODE_PRIVATE)
 
         // Инициализация RecyclerView
         val rv: RecyclerView = binding.recyclerView
@@ -132,16 +133,16 @@ class MainActivity : AppCompatActivity() {
     // Метод для отображения информации пользователя
     private fun userInfo() {
         // Создание Intent для перехода на UserInfoActivity
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(this, UserInfoActivity::class.java)
         // Запуск UserInfoActivity
         startActivity(intent)
     }
 
     // Метод для отображения настроек
     private fun settings() {
-        // Создание Intent для перехода на MainActivity
-        val intent = Intent(this, MainActivity::class.java)
-        // Запуск MainActivity
+        // Создание Intent для перехода на SettingsActivity
+        val intent = Intent(this, SettingsActivity::class.java)
+        // Запуск SettingsActivity
         startActivity(intent)
     }
 
