@@ -13,6 +13,7 @@ class ViewPhotoFragment : Fragment() {
     private lateinit var _binding: FragmentViewPhotoBinding
     // Геттер для переменной binding
     private val binding get() = _binding
+    private lateinit var photo: Photo
 
     companion object {
         private const val ARG_PHOTO = "photo"
@@ -44,19 +45,17 @@ class ViewPhotoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Получение аргументов
-        val photo = arguments?.getSerializable(ARG_PHOTO) as? Photo
+        photo = arguments?.getSerializable(ARG_PHOTO) as Photo
 
         // Отображение изображения
-        if (photo != null) {
-            if (photo.original) {
-                binding.photoView.setImageResource(photo.path.toInt())
-            } else {
-                Picasso.get()
-                    .load(photo.path)
-                    .error(R.drawable.ic_launcher_background)
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .into(binding.photoView)
-            }
+        if (photo.original) {
+            binding.photoView.setImageResource(photo.path.toInt())
+        } else {
+            Picasso.get()
+                .load(photo.path)
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(binding.photoView)
         }
 
         // Установка обработчика нажатия для кнопки рисования
@@ -75,16 +74,25 @@ class ViewPhotoFragment : Fragment() {
 
     // Функция для обработки рисования
     private fun draw() {
-        TODO("Not yet implemented")
+        // Создание экземпляра фрагмента DrawPhotoFragment с передачей переменной photo
+        val drawPhotoFragment = DrawPhotoFragment.newInstance(photo)
+        // Начало транзакции фрагмента
+        parentFragmentManager.beginTransaction()
+            // Замена текущего фрагмента на DrawPhotoFragment
+            .replace(R.id.imageContent, drawPhotoFragment)
+            // Добавление транзакции в стек обратного вызова
+            .addToBackStack(null)
+            // Завершение транзакции
+            .commit()
     }
 
     // Функция для обработки фильтрации
     private fun filter() {
-        TODO("Not yet implemented")
+
     }
 
     // Функция для обработки редактирования
     private fun edit() {
-        TODO("Not yet implemented")
+
     }
 }

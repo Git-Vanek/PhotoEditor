@@ -5,15 +5,10 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.photoeditor.databinding.ActivityPhotoBinding
-import com.squareup.picasso.Picasso
 
 class PhotoActivity : AppCompatActivity() {
     // Инициализация переменной для View Binding
     private lateinit var binding: ActivityPhotoBinding
-
-    // Ключ для SharedPreferences
-    private val MY_SETTINGS: String = "my_settings"
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Установка темы для активности
@@ -43,7 +38,7 @@ class PhotoActivity : AppCompatActivity() {
         // Начало транзакции фрагмента
         supportFragmentManager.beginTransaction()
             // Замена текущего фрагмента на ViewPhotoFragment
-            .replace(R.id.content, viewPhotoFragment)
+            .replace(R.id.imageContent, viewPhotoFragment)
             // Добавление транзакции в стек обратного вызова
             .addToBackStack(null)
             // Завершение транзакции

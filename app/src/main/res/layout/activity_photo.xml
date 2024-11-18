@@ -50,7 +50,7 @@
 
         <!-- Основная часть -->
         <LinearLayout
-            android:id="@+id/content"
+            android:id="@+id/imageContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
