@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Ни одна фотография не выбрана", Toast.LENGTH_SHORT).show()
         } else {
             for (selectedItem in selectedItems) {
-                if(!selectedItem.original) {
+                if (!selectedItem.original) {
                     // Сохранение фотографии на устройство
                     saveImageToDevice(selectedItem)
                 }
@@ -244,7 +244,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //
+    // Метод для сохранения изображения на устройство
     private fun saveImageToDevice(selectedItem: Photo) {
         val context = this
         val target = object : com.squareup.picasso.Target {
@@ -279,9 +279,23 @@ class MainActivity : AppCompatActivity() {
 
     // Метод для удаления элемента
     private fun delete() {
-
+        val selectedItems = photoAdapter.getSelectedItems()
+        if (selectedItems.isEmpty()) {
+            Toast.makeText(this, "Ни одна фотография не выбрана", Toast.LENGTH_SHORT).show()
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle("Подтверждение удаления")
+                .setMessage("Вы действительно хотите удалить выбранные фотографии?")
+                .setPositiveButton("Да") { _, _ ->
+                    photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems })
+                    photoAdapter.notifyDataSetChanged()
+                }
+                .setNegativeButton("Нет", null)
+                .show()
+        }
     }
 
+    // Метод для проверки разрешений
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
@@ -291,6 +305,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Обработка результата запроса разрешений
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE) {
