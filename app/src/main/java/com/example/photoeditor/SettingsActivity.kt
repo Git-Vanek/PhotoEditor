@@ -37,6 +37,9 @@ class SettingsActivity : AppCompatActivity() {
         imageFormatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerImageFormat.adapter = imageFormatAdapter
 
+        // Загрузка сохраненного формата изображения и установка его в Spinner
+        loadSavedImageFormat()
+
         // Установка обработчика нажатия для кнопки "Назад"
         binding.buttonBack.setOnClickListener {
             back()
@@ -45,6 +48,15 @@ class SettingsActivity : AppCompatActivity() {
         // Установка обработчика нажатия для кнопки "Сохранить"
         binding.buttonSave.setOnClickListener {
             save()
+        }
+    }
+
+    // Функция для загрузки сохраненного формата изображения
+    private fun loadSavedImageFormat() {
+        val savedImageFormat = sharedPreferences.getString("image_format", null)
+        if (savedImageFormat != null) {
+            val position = (binding.spinnerImageFormat.adapter as ArrayAdapter<String>).getPosition(savedImageFormat)
+            binding.spinnerImageFormat.setSelection(position)
         }
     }
 
