@@ -1,5 +1,6 @@
 package com.example.photoeditor
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -26,19 +27,34 @@ class PhotoActivity : AppCompatActivity() {
         // Установка Toolbar как ActionBar
         setSupportActionBar(binding.toolbar)
 
+        // Установка обработчика нажатия для кнопки "Назад"
+        binding.buttonBack.setOnClickListener {
+            back()
+        }
+
         // Получение объекта Photo из Intent
         val photo = intent.getSerializableExtra("photo") as Photo
-        // Отображение изображения
-        if (photo.original) {
-            binding.photoView.setImageResource(photo.path.toInt())
-        } else {
-            Picasso.get()
-                .load(photo.path)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(binding.photoView)
-        }
         // Установка даты
         binding.textViewCreatedAt.text = photo.createdAt.toString()
+
+        // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
+        val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
+
+        // Начало транзакции фрагмента
+        supportFragmentManager.beginTransaction()
+            // Замена текущего фрагмента на ViewPhotoFragment
+            .replace(R.id.content, viewPhotoFragment)
+            // Добавление транзакции в стек обратного вызова
+            .addToBackStack(null)
+            // Завершение транзакции
+            .commit()
+    }
+
+    // Функция для обработки возврата
+    private fun back() {
+        // Создание Intent для перехода на MainActivity
+        val intent = Intent(this, MainActivity::class.java)
+        // Переход на MainActivity
+        startActivity(intent)
     }
 }
