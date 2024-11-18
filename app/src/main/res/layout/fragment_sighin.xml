@@ -73,7 +73,7 @@
                 android:autofillHints="" />
         </LinearLayout>
 
-        <!-- Кнопка для входа -->
+        <!-- Кнопка для авторизации -->
         <Button
             android:id="@+id/buttonSignIn"
             android:layout_width="wrap_content"
@@ -90,6 +90,15 @@
             android:text="@string/signup"
             android:layout_gravity="center"
             android:layout_marginBottom="12dp" />
+
+        <!-- Кнопка для входа гостя -->
+        <Button
+            android:id="@+id/buttonGuest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/im_a_guest"
+            android:layout_gravity="center"
+            android:layout_marginBottom="12dp"/>
     </LinearLayout>
 
 </FrameLayout>

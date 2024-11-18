@@ -18,4 +18,5 @@
     <string name="edit">Edit</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="im_a_guest">Im a guest</string>
 </resources>

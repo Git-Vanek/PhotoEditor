@@ -31,7 +31,7 @@ class SighinFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Установка обработчика нажатия для кнопки входа
+        // Установка обработчика нажатия для кнопки авторизации
         binding.buttonSignIn.setOnClickListener {
             signIn()
         }
@@ -40,9 +40,14 @@ class SighinFragment : Fragment() {
         binding.buttonSignUp.setOnClickListener {
             signUp()
         }
+
+        // Установка обработчика нажатия для кнопки входа гостя
+        binding.buttonGuest.setOnClickListener {
+            guest()
+        }
     }
 
-    // Функция для обработки входа
+    // Функция для обработки авторизации
     private fun signIn() {
         // Создание Intent для перехода на MainActivity
         val intent = Intent(activity, MainActivity::class.java)
@@ -60,5 +65,13 @@ class SighinFragment : Fragment() {
             .addToBackStack(null)
             // Завершение транзакции
             .commit()
+    }
+
+    // Функция для обработки входа гостя
+    private fun guest() {
+        // Создание Intent для перехода на MainActivity
+        val intent = Intent(activity, MainActivity::class.java)
+        // Запуск MainActivity
+        startActivity(intent)
     }
 }
