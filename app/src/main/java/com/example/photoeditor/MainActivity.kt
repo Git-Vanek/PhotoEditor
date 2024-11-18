@@ -1,16 +1,32 @@
 package com.example.photoeditor
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import com.example.photoeditor.databinding.ActivityMainBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.text.InputType
+import android.widget.EditText
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
@@ -22,10 +38,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
 
     // Список фотографий
-    private lateinit var photoList: List<Photo>
+    private lateinit var photoList: MutableList<Photo>
 
     // Адаптер для RecyclerView
     private lateinit var photoAdapter: PhotoAdapter
+
+    companion object {
+        private const val REQUEST_CODE_PICK_PHOTO = 1
+        private val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +60,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         // Установка Toolbar как ActionBar
         setSupportActionBar(binding.toolbar)
+
+        checkPermissions()
 
         // Настройка SearchView
         val searchView: SearchView = findViewById(R.id.searchView)
@@ -94,20 +117,19 @@ class MainActivity : AppCompatActivity() {
     // Метод для фильтрации списка фотографий
     private fun filterList(query: String) {
         val filteredList = photoList.filter { photo ->
-            photo.name.contains(query, ignoreCase = true)
+            photo.createdAt.toString().contains(query, ignoreCase = true)
         }
         photoAdapter.filterList(filteredList)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     // Метод для создания списка фотографий
-    private fun buildPhotoList(): List<Photo> {
+    private fun buildPhotoList(): MutableList<Photo> {
         val list = mutableListOf(
-            Photo("1", "1", "1", true, R.drawable.im_1.toString(), LocalDate.parse("2018-12-12")),
-            Photo("2", "2", "2", true, R.drawable.im_2.toString(), LocalDate.parse("2019-12-12")),
-            Photo("3", "3", "3", true, R.drawable.im_3.toString(), LocalDate.parse("2020-12-12")),
+            Photo("1", "1", true, R.drawable.im_1.toString(), LocalDate.parse("2018-12-12")),
+            Photo("2", "2", true, R.drawable.im_2.toString(), LocalDate.parse("2019-12-12")),
+            Photo("3", "3", true, R.drawable.im_3.toString(), LocalDate.parse("2020-12-12")),
             Photo(
-                "4",
                 "4",
                 "4",
                 false,
@@ -117,13 +139,11 @@ class MainActivity : AppCompatActivity() {
             Photo(
                 "5",
                 "5",
-                "5",
                 false,
                 "https://i.pinimg.com/originals/2f/dd/a6/2fdda6a89ec49eea3a9818fa20705785.jpg",
                 LocalDate.parse("2022-12-12")
             ),
             Photo(
-                "6",
                 "6",
                 "6",
                 false,
@@ -158,17 +178,127 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Метод для добавления элемента
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun add() {
+        // Создаем диалоговое окно для выбора источника фотографии
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Выберите источник фотографии")
+        builder.setItems(arrayOf("С устройства", "С интернета")) { dialog, which ->
+            when (which) {
+                0 -> pickPhotoFromDevice()
+                1 -> pickPhotoFromInternet()
+            }
+        }
+        builder.show()
+    }
 
+    // Метод получения фотографии с устройства
+    private fun pickPhotoFromDevice() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, REQUEST_CODE_PICK_PHOTO)
+    }
+
+    // Обработка результата выбора фотографии с устройства
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PICK_PHOTO && resultCode == Activity.RESULT_OK) {
+            val selectedImageUri = data?.data
+            if (selectedImageUri != null) {
+                photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
+            }
+        }
+    }
+
+    // Метод получения фотографии из интернета
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun pickPhotoFromInternet() {
+        // В этом примере мы будем использовать простой EditText для ввода URL
+        val builder = AlertDialog.Builder(this)
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_TEXT_VARIATION_URI
+        builder.setTitle("Введите URL фотографии")
+        builder.setView(input)
+        builder.setPositiveButton("OK") { dialog, which ->
+            val url = input.text.toString()
+            photoList.add(Photo("8", "8", false, url, LocalDate.now()))
+        }
+        builder.setNegativeButton("Отмена") { dialog, which ->
+            dialog.cancel()
+        }
+        builder.show()
     }
 
     // Метод для загрузки элемента
     private fun load() {
+        val selectedItems = photoAdapter.getSelectedItems()
+        if (selectedItems.isEmpty()) {
+            Toast.makeText(this, "Ни одна фотография не выбрана", Toast.LENGTH_SHORT).show()
+        } else {
+            for (selectedItem in selectedItems) {
+                if(!selectedItem.original) {
+                    // Сохранение фотографии на устройство
+                    saveImageToDevice(selectedItem)
+                }
+            }
+        }
+    }
 
+    //
+    private fun saveImageToDevice(selectedItem: Photo) {
+        val context = this
+        val target = object : com.squareup.picasso.Target {
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                if (bitmap != null) {
+                    val fileName = "image_${System.currentTimeMillis()}.jpg"
+                    val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
+                    try {
+                        val outputStream = FileOutputStream(file)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                        outputStream.flush()
+                        outputStream.close()
+                        Toast.makeText(context, "Изображение сохранено: ${file.absolutePath}", Toast.LENGTH_SHORT).show()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        Toast.makeText(context, "Ошибка при сохранении изображения", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                Toast.makeText(context, "Ошибка при загрузке изображения", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                // Ничего не делаем
+            }
+        }
+
+        Picasso.get().load(selectedItem.path).into(target)
     }
 
     // Метод для удаления элемента
     private fun delete() {
 
+    }
+
+    private fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_CODE_WRITE_EXTERNAL_STORAGE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Разрешение предоставлено
+            } else {
+                Toast.makeText(this, "Разрешение на запись в память устройства не предоставлено", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
