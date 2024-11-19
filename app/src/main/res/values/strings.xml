@@ -19,4 +19,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="im_a_guest">Im a guest</string>
+    <string name="permission_to_write">Permission to write to the device memory has not been granted</string>
+    <string name="settings_saved">Settings saved</string>
 </resources>

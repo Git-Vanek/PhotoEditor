@@ -7,98 +7,10 @@
     tools:context=".MainActivity"
     android:background="@color/background">
 
-    <!-- Основной контейнер для элементов интерфейса -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!-- Верхняя панель с строкой поиска и меню -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary"
-            app:titleTextColor="@android:color/white">
-
-            <!-- Контейнер для строки поиска и кнопок -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingEnd="16dp">
-
-                <!-- Строка поиска -->
-                <androidx.appcompat.widget.SearchView
-                    android:id="@+id/searchView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:queryHint="Search"
-                    android:iconifiedByDefault="false" />
-
-                <!-- Кнопка "Информация пользователя" -->
-                <ImageButton
-                    android:id="@+id/buttonUserInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_menu_myplaces"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:layout_marginStart="8dp" />
-
-                <!-- Кнопка "Настройки" -->
-                <ImageButton
-                    android:id="@+id/buttonSettings"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_preferences"
-                    android:layout_marginStart="8dp" />
-            </LinearLayout>
-        </androidx.appcompat.widget.Toolbar>
-
-        <!-- Основная часть с RecyclerView для отображения таблицы картинок -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="16dp"
-            android:clipToPadding="false" />
-
-        <!-- Нижняя панель с кнопками "Добавить", "Загрузить" и "Удалить" -->
+        <!-- Основная часть -->
         <LinearLayout
+            android:id="@+id/mainContent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="16dp">
-
-            <!-- Кнопка "Добавить" -->
-            <Button
-                android:id="@+id/buttonAdd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add"
-                android:layout_marginEnd="16dp" />
-
-            <!-- Кнопка "Загрузить" -->
-            <Button
-                android:id="@+id/buttonLoad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/load"
-                android:layout_marginEnd="16dp" />
-
-            <!-- Кнопка "Удалить" -->
-            <Button
-                android:id="@+id/buttonDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete"
-                android:layout_marginEnd="16dp" />
-        </LinearLayout>
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,39 +1,48 @@
 package com.example.photoeditor
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.example.photoeditor.databinding.ActivitySettingsBinding
+import com.example.photoeditor.databinding.FragmentSettingsBinding
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
     // Инициализация переменной для View Binding
-    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var _binding: FragmentSettingsBinding
+    // Геттер для переменной binding
+    private val binding get() = _binding
     // Ключ для SharedPreferences
     private val MY_SETTINGS: String = "my_settings"
     private lateinit var sharedPreferences: SharedPreferences
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        // Установка темы для активности
-        setTheme(R.style.Theme_PhotoEditor)
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Инициализация View Binding для макета фрагмента
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        // Возвращение корневого элемента макета
+        return binding.root
+    }
 
-        // Инициализация View Binding
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        // Установка макета активности
-        setContentView(binding.root)
-        // Установка Toolbar как ActionBar
-        setSupportActionBar(binding.toolbar)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Инициализация SharedPreferences
-        sharedPreferences = getSharedPreferences(MY_SETTINGS, Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences(MY_SETTINGS, Context.MODE_PRIVATE)
 
         // Установка адаптеров для Spinner
         val imageFormatOptions = arrayOf("PNG", "JPG")
-        val imageFormatAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, imageFormatOptions)
+        val imageFormatAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, imageFormatOptions)
         imageFormatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerImageFormat.adapter = imageFormatAdapter
 
@@ -51,6 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+
     // Функция для загрузки сохраненного формата изображения
     private fun loadSavedImageFormat() {
         val savedImageFormat = sharedPreferences.getString("image_format", null)
@@ -62,10 +72,14 @@ class SettingsActivity : AppCompatActivity() {
 
     // Функция для обработки возврата
     private fun back() {
-        // Создание Intent для перехода на MainActivity
-        val intent = Intent(this, MainActivity::class.java)
-        // Переход на MainActivity
-        startActivity(intent)
+        // Начало транзакции фрагмента
+        parentFragmentManager.beginTransaction()
+            // Замена текущего фрагмента на MainFragment
+            .replace(R.id.mainContent, MainFragment())
+            // Добавление транзакции в стек обратного вызова
+            .addToBackStack(null)
+            // Завершение транзакции
+            .commit()
     }
 
     private fun save() {
@@ -79,6 +93,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Подтверждение сохранения
-        Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context,
+            getString(com.example.photoeditor.R.string.settings_saved), Toast.LENGTH_SHORT).show()
     }
 }
