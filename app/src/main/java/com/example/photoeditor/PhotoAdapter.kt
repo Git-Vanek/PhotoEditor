@@ -1,5 +1,6 @@
 package com.example.photoeditor
 
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import java.io.File
 
 // Адаптер для RecyclerView, который работает с фотографиями
 class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
@@ -35,14 +37,27 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
 
     // Метод для привязки данных к элементу интерфейса
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        if (position >= dataset.size) {
+            return
+        }
+
+        val photo = dataset[position]
+
         // Проверка, является ли изображение оригинальным
-        if (dataset[position].original) {
-            // Установка изображения из ресурсов
-            viewHolder.image.setImageResource(dataset[position].path.toInt())
+        if (photo.original) {
+            // Загрузка изображения с устройства
+            val file = File(photo.path)
+            if (file.exists()) {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                viewHolder.image.setImageBitmap(bitmap)
+            } else {
+                // Обработка случая, когда файл не найден
+                viewHolder.image.setImageResource(R.drawable.ic_launcher_background)
+            }
         } else {
             // Загрузка изображения из URL с использованием Picasso
             Picasso.get()
-                .load(dataset[position].path)
+                .load(photo.path)
                 .error(R.drawable.ic_launcher_background) // Изображение для ошибки
                 .placeholder(R.drawable.ic_launcher_foreground) // Заглушка
                 .into(viewHolder.image)
@@ -50,11 +65,11 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
 
         // Обработка нажатия на изображение
         viewHolder.image.setOnClickListener {
-            itemClickListener(dataset[position])
+            itemClickListener(photo)
         }
 
         // Установка состояния CheckBox в зависимости от выбранных элементов
-        viewHolder.check.isChecked = selectedItems.contains(element = dataset[position])
+        viewHolder.check.isChecked = selectedItems.contains(photo)
         // Установка видимости CheckBox в зависимости от режима выбора
         viewHolder.check.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
 
@@ -68,9 +83,9 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
         // Обработка изменения состояния CheckBox
         viewHolder.check.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                selectedItems.add(dataset[position])
+                selectedItems.add(photo)
             } else {
-                selectedItems.remove(dataset[position])
+                selectedItems.remove(photo)
             }
         }
     }

@@ -5,6 +5,8 @@
         <item name="colorPrimary">@color/primary</item>
         <!-- Стили кнопок -->
         <item name="materialButtonStyle">@style/Widget.PhotoEditor.Button</item>
+        <!-- Стили MaterialAlertDialogBuilder -->
+        <item name="alertDialogTheme">@style/Widget.PhotoEditor.AlertDialog</item>
     </style>
 
     <style name="LaunchScreen" parent="Base.Theme.PhotoEditor">

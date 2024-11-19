@@ -1,7 +1,6 @@
 package com.example.photoeditor
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -23,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.squareup.picasso.Picasso
 import java.io.File
 import java.io.FileOutputStream
@@ -126,9 +126,9 @@ class MainActivity : AppCompatActivity() {
     // Метод для создания списка фотографий
     private fun buildPhotoList(): MutableList<Photo> {
         val list = mutableListOf(
-            Photo("1", "1", true, R.drawable.im_1.toString(), LocalDate.parse("2018-12-12")),
-            Photo("2", "2", true, R.drawable.im_2.toString(), LocalDate.parse("2019-12-12")),
-            Photo("3", "3", true, R.drawable.im_3.toString(), LocalDate.parse("2020-12-12")),
+            Photo("1", "1", true, "/storage/emulated/0/Pictures/Screenshots/im_1.jpg", LocalDate.parse("2018-12-12")),
+            Photo("2", "2", true, "/storage/emulated/0/Pictures/Screenshots/im_2.jpg", LocalDate.parse("2019-12-12")),
+            Photo("3", "3", true, "/storage/emulated/0/Pictures/Screenshots/im_3.jpg", LocalDate.parse("2020-12-12")),
             Photo(
                 "4",
                 "4",
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun add() {
         // Создаем диалоговое окно для выбора источника фотографии
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.Widget_PhotoEditor_AlertDialog)
         builder.setTitle("Выберите источник фотографии")
         builder.setItems(arrayOf("С устройства", "С интернета")) { dialog, which ->
             when (which) {
@@ -206,6 +206,7 @@ class MainActivity : AppCompatActivity() {
             val selectedImageUri = data?.data
             if (selectedImageUri != null) {
                 photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
+                photoAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -214,7 +215,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun pickPhotoFromInternet() {
         // В этом примере мы будем использовать простой EditText для ввода URL
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.Widget_PhotoEditor_AlertDialog)
         val input = EditText(this)
         input.inputType = InputType.TYPE_TEXT_VARIATION_URI
         builder.setTitle("Введите URL фотографии")
@@ -233,13 +234,16 @@ class MainActivity : AppCompatActivity() {
     private fun load() {
         val selectedItems = photoAdapter.getSelectedItems()
         if (selectedItems.isEmpty()) {
-            Toast.makeText(this, "Ни одна фотография не выбрана", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Ни одна фотография не выбрана", Toast.LENGTH_LONG).show()
         } else {
             for (selectedItem in selectedItems) {
                 if (!selectedItem.original) {
                     // Сохранение фотографии на устройство
                     saveImageToDevice(selectedItem)
                 }
+                else (
+                    Toast.makeText(applicationContext, "Фотография уже на вашем устройстве.", Toast.LENGTH_LONG).show()
+                )
             }
         }
     }
@@ -281,9 +285,9 @@ class MainActivity : AppCompatActivity() {
     private fun delete() {
         val selectedItems = photoAdapter.getSelectedItems()
         if (selectedItems.isEmpty()) {
-            Toast.makeText(this, "Ни одна фотография не выбрана", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Ни одна фотография не выбрана", Toast.LENGTH_LONG).show()
         } else {
-            AlertDialog.Builder(this)
+            MaterialAlertDialogBuilder(this, R.style.Widget_PhotoEditor_AlertDialog)
                 .setTitle("Подтверждение удаления")
                 .setMessage("Вы действительно хотите удалить выбранные фотографии?")
                 .setPositiveButton("Да") { _, _ ->
@@ -312,7 +316,7 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Разрешение предоставлено
             } else {
-                Toast.makeText(this, "Разрешение на запись в память устройства не предоставлено", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Разрешение на запись в память устройства не предоставлено", Toast.LENGTH_LONG).show()
             }
         }
     }

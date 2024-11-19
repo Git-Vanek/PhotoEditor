@@ -7,4 +7,18 @@
         <item name="android:textColor">@color/onPrimary</item>
         <item name="cornerRadius">8dp</item>
     </style>
+    <!-- Стиль для AlertDialog -->
+    <style name="Widget.PhotoEditor.AlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/CustomButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/CustomButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/CustomButtonStyle</item>
+    </style>
+
+    <!-- Стиль для кнопок в AlertDialog -->
+    <style name="CustomButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/onPrimary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>
