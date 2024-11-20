@@ -3,7 +3,9 @@ package com.example.photoeditor
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -25,6 +27,7 @@ import com.squareup.picasso.Picasso
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.time.LocalDate
 
 
@@ -209,9 +212,27 @@ class MainFragment : Fragment() {
         if (requestCode == REQUEST_CODE_PICK_PHOTO && resultCode == Activity.RESULT_OK) {
             val selectedImageUri = data?.data
             if (selectedImageUri != null) {
-                photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
-                photoAdapter.notifyDataSetChanged()
+                val bitmap = getBitmapFromUri(selectedImageUri)
+                if (bitmap != null) {
+                    // Добавьте фото в список и обновите адаптер
+                    photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
+                    photoAdapter.notifyDataSetChanged()
+                }
             }
+        }
+    }
+
+    //
+    private fun getBitmapFromUri(uri: Uri): Bitmap? {
+        var inputStream: InputStream? = null
+        return try {
+            inputStream = requireContext().contentResolver.openInputStream(uri)
+            BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        } finally {
+            inputStream?.close()
         }
     }
 

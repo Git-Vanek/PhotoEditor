@@ -1,6 +1,8 @@
 package com.example.photoeditor
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import java.io.File
+import java.io.InputStream
 
 // Адаптер для RecyclerView, который работает с фотографиями
 class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
@@ -46,14 +49,14 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
         // Проверка, является ли изображение оригинальным
         if (photo.original) {
             // Загрузка изображения с устройства
-            val file = File(photo.path)
-            if (file.exists()) {
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+            //val file = File(photo.path)
+
+                val bitmap = getBitmapFromUri(Uri.parse(photo.path), viewHolder)
                 viewHolder.image.setImageBitmap(bitmap)
-            } else {
+
                 // Обработка случая, когда файл не найден
-                viewHolder.image.setImageResource(R.drawable.ic_launcher_background)
-            }
+                //viewHolder.image.setImageResource(R.drawable.ic_launcher_background)
+
         } else {
             // Загрузка изображения из URL с использованием Picasso
             Picasso.get()
@@ -102,5 +105,19 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
     fun filterList(filteredList: List<Photo>) {
         dataset = filteredList
         notifyDataSetChanged()
+    }
+
+    //
+    private fun getBitmapFromUri(uri: Uri, viewHolder: ViewHolder): Bitmap? {
+        var inputStream: InputStream? = null
+        return try {
+            inputStream = viewHolder.image.context.contentResolver.openInputStream(uri)
+            BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        } finally {
+            inputStream?.close()
+        }
     }
 }
