@@ -49,14 +49,9 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
         // Проверка, является ли изображение оригинальным
         if (photo.original) {
             // Загрузка изображения с устройства
-            //val file = File(photo.path)
-
-                val bitmap = getBitmapFromUri(Uri.parse(photo.path), viewHolder)
-                viewHolder.image.setImageBitmap(bitmap)
-
-                // Обработка случая, когда файл не найден
-                //viewHolder.image.setImageResource(R.drawable.ic_launcher_background)
-
+            Picasso.get()
+                .load(Uri.parse(photo.path))
+                .into(viewHolder.image)
         } else {
             // Загрузка изображения из URL с использованием Picasso
             Picasso.get()
@@ -105,19 +100,5 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
     fun filterList(filteredList: List<Photo>) {
         dataset = filteredList
         notifyDataSetChanged()
-    }
-
-    //
-    private fun getBitmapFromUri(uri: Uri, viewHolder: ViewHolder): Bitmap? {
-        var inputStream: InputStream? = null
-        return try {
-            inputStream = viewHolder.image.context.contentResolver.openInputStream(uri)
-            BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        } finally {
-            inputStream?.close()
-        }
     }
 }

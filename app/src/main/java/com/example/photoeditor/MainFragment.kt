@@ -125,9 +125,6 @@ class MainFragment : Fragment() {
     // Метод для создания списка фотографий
     private fun buildPhotoList(): MutableList<Photo> {
         val list = mutableListOf(
-            Photo("1", "1", true, "/storage/emulated/0/Pictures/Screenshots/im_1.jpg", LocalDate.parse("2018-12-12")),
-            Photo("2", "2", true, "/storage/emulated/0/Pictures/Screenshots/im_2.jpg", LocalDate.parse("2019-12-12")),
-            Photo("3", "3", true, "/storage/emulated/0/Pictures/Screenshots/im_3.jpg", LocalDate.parse("2020-12-12")),
             Photo(
                 "4",
                 "4",
@@ -212,27 +209,9 @@ class MainFragment : Fragment() {
         if (requestCode == REQUEST_CODE_PICK_PHOTO && resultCode == Activity.RESULT_OK) {
             val selectedImageUri = data?.data
             if (selectedImageUri != null) {
-                val bitmap = getBitmapFromUri(selectedImageUri)
-                if (bitmap != null) {
-                    // Добавьте фото в список и обновите адаптер
-                    photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
-                    photoAdapter.notifyDataSetChanged()
-                }
+                photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
+                photoAdapter.notifyDataSetChanged()
             }
-        }
-    }
-
-    //
-    private fun getBitmapFromUri(uri: Uri): Bitmap? {
-        var inputStream: InputStream? = null
-        return try {
-            inputStream = requireContext().contentResolver.openInputStream(uri)
-            BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        } finally {
-            inputStream?.close()
         }
     }
 
@@ -259,16 +238,24 @@ class MainFragment : Fragment() {
     private fun load() {
         val selectedItems = photoAdapter.getSelectedItems()
         if (selectedItems.isEmpty()) {
-            Toast.makeText(requireContext(), "Ни одна фотография не выбрана", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireContext(),
+                "Ни одна фотография не выбрана",
+                Toast.LENGTH_LONG)
+                .show()
         } else {
             for (selectedItem in selectedItems) {
                 if (!selectedItem.original) {
                     // Сохранение фотографии на устройство
                     saveImageToDevice(selectedItem)
                 }
-                else (
-                        Toast.makeText(requireContext(), "Фотография уже на вашем устройстве.", Toast.LENGTH_LONG).show()
-                        )
+                else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Фотография уже на вашем устройстве.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
