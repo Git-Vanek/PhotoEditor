@@ -3,6 +3,7 @@ package com.example.photoeditor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -64,8 +65,29 @@ class DrawPhotoFragment : Fragment() {
             .build()
         // Отображение изображения
         if (photo.original) {
-            photoEditorView.source.setImageResource(photo.path.toInt())
+            // Загрузка изображения с устройства
+            val imageView = ImageView(requireContext())
+            Picasso.get()
+                .load(Uri.parse(photo.path))
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(object : Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bitmap?.let {
+                            photoEditorView.source.setImageBitmap(it)
+                        }
+                    }
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        // Обработка ошибки загрузки изображения
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                        // Обработка подготовки загрузки изображения
+                    }
+                })
         } else {
+            // Загрузка изображения из интернета
             val imageView = ImageView(requireContext())
             Picasso.get()
                 .load(photo.path)
