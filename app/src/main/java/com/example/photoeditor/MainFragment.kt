@@ -3,9 +3,7 @@ package com.example.photoeditor
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -27,9 +25,7 @@ import com.squareup.picasso.Picasso
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
 import java.time.LocalDate
-
 
 class MainFragment : Fragment() {
     // Инициализация переменной для View Binding
@@ -91,23 +87,27 @@ class MainFragment : Fragment() {
         rv.adapter = photoAdapter
         rv.layoutManager = GridLayoutManager(context, 3) // 3 элемента в строке
 
-        // Установка обработчиков нажатия для кнопок
+        // Установка обработчика нажатия для кнопки информация пользователя
         binding.buttonUserInfo.setOnClickListener {
             userInfo()
         }
 
+        // Установка обработчика нажатия для кнопки настройки
         binding.buttonSettings.setOnClickListener {
             settings()
         }
 
+        // Установка обработчика нажатия для кнопки добавления
         binding.buttonAdd.setOnClickListener {
             add()
         }
 
+        // Установка обработчика нажатия для кнопки загрузки
         binding.buttonLoad.setOnClickListener {
             load()
         }
 
+        // Установка обработчика нажатия для кнопки удаления
         binding.buttonDelete.setOnClickListener {
             delete()
         }
@@ -121,8 +121,8 @@ class MainFragment : Fragment() {
         photoAdapter.filterList(filteredList)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     // Метод для создания списка фотографий
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun buildPhotoList(): MutableList<Photo> {
         val list = mutableListOf(
             Photo(
@@ -273,16 +273,28 @@ class MainFragment : Fragment() {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                         outputStream.flush()
                         outputStream.close()
-                        Toast.makeText(fragment, "Изображение сохранено: ${file.absolutePath}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            fragment,
+                            "Изображение сохранено: ${file.absolutePath}",
+                            Toast.LENGTH_SHORT)
+                            .show()
                     } catch (e: IOException) {
                         e.printStackTrace()
-                        Toast.makeText(fragment, "Ошибка при сохранении изображения", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            fragment,
+                            "Ошибка при сохранении изображения",
+                            Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }
 
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                Toast.makeText(fragment, "Ошибка при загрузке изображения", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    fragment,
+                    "Ошибка при загрузке изображения",
+                    Toast.LENGTH_SHORT)
+                    .show()
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
@@ -297,7 +309,11 @@ class MainFragment : Fragment() {
     private fun delete() {
         val selectedItems = photoAdapter.getSelectedItems()
         if (selectedItems.isEmpty()) {
-            Toast.makeText(requireContext(), "Ни одна фотография не выбрана", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireContext(),
+                "Ни одна фотография не выбрана",
+                Toast.LENGTH_LONG)
+                .show()
         } else {
             MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
                 .setTitle("Подтверждение удаления")

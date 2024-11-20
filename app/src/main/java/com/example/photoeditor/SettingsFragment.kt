@@ -93,7 +93,10 @@ class SettingsFragment : Fragment() {
         }
 
         // Подтверждение сохранения
-        Toast.makeText(context,
-            getString(com.example.photoeditor.R.string.settings_saved), Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            getString(R.string.settings_saved),
+            Toast.LENGTH_SHORT)
+            .show()
     }
 }

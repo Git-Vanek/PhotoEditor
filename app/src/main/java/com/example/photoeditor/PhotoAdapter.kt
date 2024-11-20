@@ -1,7 +1,5 @@
 package com.example.photoeditor
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +8,6 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import java.io.File
-import java.io.InputStream
 
 // Адаптер для RecyclerView, который работает с фотографиями
 class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
@@ -53,7 +49,7 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
                 .load(Uri.parse(photo.path))
                 .into(viewHolder.image)
         } else {
-            // Загрузка изображения из URL с использованием Picasso
+            // Загрузка изображения из интернета
             Picasso.get()
                 .load(photo.path)
                 .error(R.drawable.ic_launcher_background) // Изображение для ошибки

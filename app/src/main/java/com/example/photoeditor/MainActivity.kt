@@ -1,7 +1,6 @@
 package com.example.photoeditor
 
 import android.content.pm.PackageManager
-import android.os.Build
 import com.example.photoeditor.databinding.ActivityMainBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -56,7 +55,11 @@ class MainActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Разрешение предоставлено
             } else {
-                Toast.makeText(applicationContext, getString(R.string.permission_to_write), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    applicationContext,
+                    getString(R.string.permission_to_write),
+                    Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }

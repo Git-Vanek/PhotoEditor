@@ -1,5 +1,6 @@
 package com.example.photoeditor
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -49,8 +50,12 @@ class ViewPhotoFragment : Fragment() {
 
         // Отображение изображения
         if (photo.original) {
-            binding.photoView.setImageResource(photo.path.toInt())
+            // Загрузка изображения с устройства
+            Picasso.get()
+                .load(Uri.parse(photo.path))
+                .into(binding.photoView)
         } else {
+            // Загрузка изображения из интернета
             Picasso.get()
                 .load(photo.path)
                 .error(R.drawable.ic_launcher_background)
@@ -62,10 +67,12 @@ class ViewPhotoFragment : Fragment() {
         binding.buttonDraw.setOnClickListener {
             draw()
         }
+
         // Установка обработчика нажатия для кнопки фильтрации
         binding.buttonFilter.setOnClickListener {
             filter()
         }
+
         // Установка обработчика нажатия для кнопки редактирования
         binding.buttonEdit.setOnClickListener {
             edit()
