@@ -333,14 +333,15 @@ class MainFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 "Ни одна фотография не выбрана",
-                Toast.LENGTH_LONG)
-                .show()
+                Toast.LENGTH_LONG
+            ).show()
         } else {
             MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
                 .setTitle("Подтверждение удаления")
                 .setMessage("Вы действительно хотите удалить выбранные фотографии?")
                 .setPositiveButton("Да") { _, _ ->
                     photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems })
+                    photoAdapter.clearSelection()
                     photoAdapter.notifyDataSetChanged()
                 }
                 .setNegativeButton("Нет", null)

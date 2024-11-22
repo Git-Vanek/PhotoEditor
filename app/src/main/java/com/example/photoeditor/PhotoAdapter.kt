@@ -92,6 +92,12 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
         return selectedItems
     }
 
+    // Метод для очистки
+    fun clearSelection() {
+        selectedItems.clear()
+        isSelectionMode = false
+    }
+
     // Метод для фильтрации списка фотографий
     fun filterList(filteredList: List<Photo>) {
         dataset = filteredList
