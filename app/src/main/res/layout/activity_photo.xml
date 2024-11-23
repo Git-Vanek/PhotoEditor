@@ -7,54 +7,12 @@
     tools:context=".PhotoActivity"
     android:background="@color/background">
 
-    <!-- Основной контейнер для элементов интерфейса -->
+    <!-- Основная часть -->
     <LinearLayout
+        android:id="@+id/imageContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Верхняя панель с кнопкой "Назад" -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary"
-            app:titleTextColor="@android:color/white">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp" >
-
-                <TextView
-                    android:id="@+id/textViewCreatedAt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_gravity="center"
-                    android:textColor="@android:color/white"/>
-
-                <ImageButton
-                    android:id="@+id/buttonBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/back"
-                    android:src="@android:drawable/ic_menu_revert" />
-            </LinearLayout>
-        </androidx.appcompat.widget.Toolbar>
-
-        <!-- Основная часть -->
-        <LinearLayout
-            android:id="@+id/imageContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
