@@ -18,18 +18,9 @@ class PhotoActivity : AppCompatActivity() {
         binding = ActivityPhotoBinding.inflate(layoutInflater)
         // Установка макета активности
         setContentView(binding.root)
-        // Установка Toolbar как ActionBar
-        setSupportActionBar(binding.toolbar)
-
-        // Установка обработчика нажатия для кнопки "Назад"
-        binding.buttonBack.setOnClickListener {
-            back()
-        }
 
         // Получение объекта Photo из Intent
         val photo = intent.getSerializableExtra("photo") as Photo
-        // Установка даты
-        binding.textViewCreatedAt.text = photo.createdAt.toString()
 
         // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
         val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
