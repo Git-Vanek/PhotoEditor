@@ -17,8 +17,8 @@ class EditPhotoFragment : Fragment() {
     companion object {
         private const val ARG_PHOTO = "photo"
 
-        fun newInstance(photo: Photo): DrawPhotoFragment {
-            val fragment = DrawPhotoFragment()
+        fun newInstance(photo: Photo): EditPhotoFragment {
+            val fragment = EditPhotoFragment()
             val args = Bundle()
             args.putSerializable(ARG_PHOTO, photo)
             fragment.arguments = args
