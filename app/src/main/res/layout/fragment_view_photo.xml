@@ -30,21 +30,22 @@
                     android:id="@+id/buttonBack"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/back"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:src="@drawable/ic_arrow_back"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:layout_marginStart="8dp"/>
 
                 <TextView
-                    android:id="@+id/textViewCreatedAt"
-                    android:layout_width="match_parent"
+                    android:id="@+id/textViewPhotoView"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textSize="18sp"
                     android:layout_marginStart="8dp"
                     android:layout_gravity="center"
-                    android:text="Photo View"
-                    android:textColor="@android:color/white"/>
+                    android:text="@string/photo_view"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 

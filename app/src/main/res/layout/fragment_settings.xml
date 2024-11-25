@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Верхняя панель с кнопкой "Назад" -->
+        <!-- Верхняя панель -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -21,15 +21,33 @@
             app:popupTheme="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary"
             app:titleTextColor="@android:color/white">
 
-            <ImageButton
-                android:id="@+id/buttonBack"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/back"
-                android:src="@android:drawable/ic_menu_revert"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp" />
+                android:orientation="horizontal"
+                android:layout_marginEnd="16dp" >
+
+                <ImageButton
+                    android:id="@+id/buttonBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/back"
+                    android:src="@drawable/ic_arrow_back"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_marginStart="8dp"/>
+
+                <TextView
+                    android:id="@+id/textViewUserInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="18sp"
+                    android:layout_marginStart="8dp"
+                    android:layout_gravity="center"
+                    android:text="@string/settings"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"/>
+            </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
         <!-- Контейнер для полей отображения данных пользователя -->

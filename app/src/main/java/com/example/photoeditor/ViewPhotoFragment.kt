@@ -95,12 +95,12 @@ class ViewPhotoFragment : Fragment() {
 
     // Функция для обработки фильтрации
     private fun filter() {
-        // Создание экземпляра фрагмента DrawPhotoFragment с передачей переменной photo
-        val drawPhotoFragment = DrawPhotoFragment.newInstance(photo)
+        // Создание экземпляра фрагмента FilterPhotoFragment с передачей переменной photo
+        val filterPhotoFragment = FilterPhotoFragment.newInstance(photo)
         // Начало транзакции фрагмента
         parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на DrawPhotoFragment
-            .replace(R.id.imageContent, drawPhotoFragment)
+            // Замена текущего фрагмента на FilterPhotoFragment
+            .replace(R.id.imageContent, filterPhotoFragment)
             // Добавление транзакции в стек обратного вызова
             .addToBackStack(null)
             // Завершение транзакции
@@ -109,12 +109,12 @@ class ViewPhotoFragment : Fragment() {
 
     // Функция для обработки редактирования
     private fun edit() {
-        // Создание экземпляра фрагмента DrawPhotoFragment с передачей переменной photo
-        val drawPhotoFragment = DrawPhotoFragment.newInstance(photo)
+        // Создание экземпляра фрагмента EditPhotoFragment с передачей переменной photo
+        val editPhotoFragment = EditPhotoFragment.newInstance(photo)
         // Начало транзакции фрагмента
         parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на DrawPhotoFragment
-            .replace(R.id.imageContent, drawPhotoFragment)
+            // Замена текущего фрагмента на EditPhotoFragment
+            .replace(R.id.imageContent, editPhotoFragment)
             // Добавление транзакции в стек обратного вызова
             .addToBackStack(null)
             // Завершение транзакции

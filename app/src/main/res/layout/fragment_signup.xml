@@ -24,7 +24,7 @@
                 android:id="@+id/imageView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                app:srcCompat="@android:drawable/ic_menu_my_calendar"
+                app:srcCompat="@drawable/ic_account_circle"
                 android:contentDescription="@string/username" />
 
             <!-- Поле ввода имени пользователя -->
@@ -53,7 +53,7 @@
                 android:id="@+id/imageView2"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                app:srcCompat="@android:drawable/ic_menu_mapmode"
+                app:srcCompat="@drawable/ic_email"
                 android:contentDescription="@string/email" />
 
             <!-- Поле ввода email -->
@@ -85,7 +85,7 @@
                 android:id="@+id/imageView3"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                app:srcCompat="@android:drawable/ic_menu_edit"
+                app:srcCompat="@drawable/ic_shield"
                 android:contentDescription="@string/password" />
 
             <!-- Поле ввода пароля -->
@@ -120,5 +120,4 @@
             android:layout_gravity="center"
             android:layout_marginBottom="12dp" />
     </LinearLayout>
-
 </FrameLayout>

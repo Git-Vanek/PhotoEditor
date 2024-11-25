@@ -36,14 +36,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:queryHint="Search"
-                    android:iconifiedByDefault="false" />
+                    android:iconifiedByDefault="false"
+                    app:searchIcon="@drawable/ic_search"/>
 
                 <!-- Кнопка "Информация пользователя" -->
                 <ImageButton
                     android:id="@+id/buttonUserInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_menu_myplaces"
+                    android:contentDescription="@string/user_info"
+                    android:src="@drawable/ic_account_box"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:layout_marginStart="8dp" />
 
@@ -52,8 +54,9 @@
                     android:id="@+id/buttonSettings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/settings"
+                    android:src="@drawable/ic_settings"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_preferences"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
