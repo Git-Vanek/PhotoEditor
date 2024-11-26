@@ -1,7 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Базовая тема программы -->
     <style name="Base.Theme.PhotoEditor" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Основные цвета -->
+        <item name="colorPrimary">@color/primary</item>
+        <!-- Стили кнопок -->
+        <item name="materialButtonStyle">@style/Widget.PhotoEditor.Button</item>
+        <!-- Стили MaterialAlertDialogBuilder -->
+        <item name="alertDialogTheme">@style/Widget.PhotoEditor.AlertDialog</item>
     </style>
+
+    <style name="LaunchScreen" parent="Base.Theme.PhotoEditor">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <style name="Theme.PhotoEditor" parent="Base.Theme.PhotoEditor" />
 </resources>
