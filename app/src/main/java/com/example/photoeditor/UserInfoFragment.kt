@@ -1,11 +1,13 @@
 package com.example.photoeditor
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import com.example.photoeditor.databinding.FragmentUserInfoBinding
 import java.time.LocalDate
 
@@ -26,6 +28,7 @@ class UserInfoFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
@@ -56,7 +59,7 @@ class UserInfoFragment : Fragment() {
         // Начало транзакции фрагмента
         parentFragmentManager.beginTransaction()
             // Замена текущего фрагмента на MainFragment
-            .replace(com.example.photoeditor.R.id.mainContent, MainFragment())
+            .replace(R.id.mainContent, MainFragment())
             // Добавление транзакции в стек обратного вызова
             .addToBackStack(null)
             // Завершение транзакции

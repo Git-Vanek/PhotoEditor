@@ -27,6 +27,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.time.LocalDate
 
+@Suppress("DEPRECATION")
 class MainFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentMainBinding
@@ -118,13 +119,13 @@ class MainFragment : Fragment() {
         val filteredList = photoList.filter { photo ->
             photo.createdAt.toString().contains(query, ignoreCase = true)
         }
-        photoAdapter.filterList(filteredList)
+        photoAdapter.filterList(filteredList.toMutableList())
     }
 
     // Метод для создания списка фотографий
     @RequiresApi(Build.VERSION_CODES.O)
     private fun buildPhotoList(): MutableList<Photo> {
-        val list = mutableListOf(
+        return mutableListOf(
             Photo(
                 "1",
                 "1",
@@ -168,7 +169,6 @@ class MainFragment : Fragment() {
                 LocalDate.parse("2023-12-12")
             )
         )
-        return list
     }
 
     // Метод для отображения информации пользователя
@@ -208,7 +208,7 @@ class MainFragment : Fragment() {
         // Создаем диалоговое окно для выбора источника фотографии
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
         builder.setTitle("Выберите источник фотографии")
-        builder.setItems(arrayOf("С устройства", "С интернета")) { dialog, which ->
+        builder.setItems(arrayOf("С устройства", "С интернета")) { _, which ->
             when (which) {
                 0 -> pickPhotoFromDevice()
                 1 -> pickPhotoFromInternet()
@@ -224,14 +224,14 @@ class MainFragment : Fragment() {
     }
 
     // Обработка результата выбора фотографии с устройства
+    @Deprecated("Deprecated in Java")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_PICK_PHOTO && resultCode == Activity.RESULT_OK) {
             val selectedImageUri = data?.data
             if (selectedImageUri != null) {
-                photoList.add(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
-                photoAdapter.notifyDataSetChanged()
+                photoAdapter.addItem(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
             }
         }
     }
@@ -245,11 +245,11 @@ class MainFragment : Fragment() {
         input.inputType = InputType.TYPE_TEXT_VARIATION_URI
         builder.setTitle("Введите URL фотографии")
         builder.setView(input)
-        builder.setPositiveButton("OK") { dialog, which ->
+        builder.setPositiveButton("OK") { _, _ ->
             val url = input.text.toString()
             photoList.add(Photo("8", "8", false, url, LocalDate.now()))
         }
-        builder.setNegativeButton("Отмена") { dialog, which ->
+        builder.setNegativeButton("Отмена") { dialog, _ ->
             dialog.cancel()
         }
         builder.show()
@@ -340,9 +340,8 @@ class MainFragment : Fragment() {
                 .setTitle("Подтверждение удаления")
                 .setMessage("Вы действительно хотите удалить выбранные фотографии?")
                 .setPositiveButton("Да") { _, _ ->
-                    photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems })
+                    photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems }.toMutableList())
                     photoAdapter.clearSelection()
-                    photoAdapter.notifyDataSetChanged()
                 }
                 .setNegativeButton("Нет", null)
                 .show()

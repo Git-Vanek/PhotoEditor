@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.photoeditor.databinding.FragmentFilterPhotoBinding
 
+@Suppress("DEPRECATION")
 class FilterPhotoFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentFilterPhotoBinding
@@ -45,5 +46,6 @@ class FilterPhotoFragment : Fragment() {
 
         // Получение аргументов
         val photo = arguments?.getSerializable(ARG_PHOTO) as Photo
+
     }
 }

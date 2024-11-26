@@ -17,7 +17,7 @@ class SettingsFragment : Fragment() {
     // Геттер для переменной binding
     private val binding get() = _binding
     // Ключ для SharedPreferences
-    private val MY_SETTINGS: String = "my_settings"
+    private val settings: String = "my_settings"
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
@@ -38,7 +38,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Инициализация SharedPreferences
-        sharedPreferences = requireContext().getSharedPreferences(MY_SETTINGS, Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
 
         // Установка адаптеров для Spinner
         val imageFormatOptions = arrayOf("PNG", "JPG")
@@ -65,7 +65,7 @@ class SettingsFragment : Fragment() {
     private fun loadSavedImageFormat() {
         val savedImageFormat = sharedPreferences.getString("image_format", null)
         if (savedImageFormat != null) {
-            val position = (binding.spinnerImageFormat.adapter as ArrayAdapter<String>).getPosition(savedImageFormat)
+            @Suppress("UNCHECKED_CAST") val position = (binding.spinnerImageFormat.adapter as ArrayAdapter<String>).getPosition(savedImageFormat)
             binding.spinnerImageFormat.setSelection(position)
         }
     }

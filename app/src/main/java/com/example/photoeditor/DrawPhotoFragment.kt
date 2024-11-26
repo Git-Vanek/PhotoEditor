@@ -9,13 +9,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import com.example.photoeditor.databinding.FragmentDrawPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
 
+@Suppress("DEPRECATION")
 class DrawPhotoFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentDrawPhotoBinding
@@ -66,7 +66,6 @@ class DrawPhotoFragment : Fragment() {
         // Отображение изображения
         if (photo.original) {
             // Загрузка изображения с устройства
-            val imageView = ImageView(requireContext())
             Picasso.get()
                 .load(Uri.parse(photo.path))
                 .error(R.drawable.ic_launcher_background)
@@ -88,7 +87,6 @@ class DrawPhotoFragment : Fragment() {
                 })
         } else {
             // Загрузка изображения из интернета
-            val imageView = ImageView(requireContext())
             Picasso.get()
                 .load(photo.path)
                 .error(R.drawable.ic_launcher_background)

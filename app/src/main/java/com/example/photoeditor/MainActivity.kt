@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     companion object {
-        private val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
+        private const val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

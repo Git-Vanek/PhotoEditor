@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 // Адаптер для RecyclerView, который работает с фотографиями
-class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
+class PhotoAdapter(var dataset: MutableList<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
 
     // Список выбранных элементов
     private val selectedItems = mutableListOf<Photo>()
@@ -95,12 +95,19 @@ class PhotoAdapter(var dataset: List<Photo>, private val itemClickListener: (Pho
     // Метод для очистки
     fun clearSelection() {
         selectedItems.clear()
+        notifyDataSetChanged()
         isSelectionMode = false
     }
 
     // Метод для фильтрации списка фотографий
-    fun filterList(filteredList: List<Photo>) {
+    fun filterList(filteredList: MutableList<Photo>) {
         dataset = filteredList
         notifyDataSetChanged()
+    }
+
+    // Метод для добавления одного элемента
+    fun addItem(newData: Photo) {
+        dataset.add(newData)
+        notifyItemInserted(dataset.size - 1)
     }
 }

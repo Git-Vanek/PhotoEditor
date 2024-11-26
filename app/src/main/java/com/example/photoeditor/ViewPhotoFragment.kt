@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.example.photoeditor.databinding.FragmentViewPhotoBinding
 import com.squareup.picasso.Picasso
 
+@Suppress("DEPRECATION")
 class ViewPhotoFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentViewPhotoBinding

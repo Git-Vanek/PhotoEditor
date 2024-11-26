@@ -1,6 +1,5 @@
 package com.example.photoeditor
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.photoeditor.databinding.ActivityPhotoBinding
@@ -20,7 +19,7 @@ class PhotoActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Получение объекта Photo из Intent
-        val photo = intent.getSerializableExtra("photo") as Photo
+        @Suppress("DEPRECATION") val photo = intent.getSerializableExtra("photo") as Photo
 
         // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
         val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
@@ -33,13 +32,5 @@ class PhotoActivity : AppCompatActivity() {
             .addToBackStack(null)
             // Завершение транзакции
             .commit()
-    }
-
-    // Функция для обработки возврата
-    private fun back() {
-        // Создание Intent для перехода на MainActivity
-        val intent = Intent(this, MainActivity::class.java)
-        // Переход на MainActivity
-        startActivity(intent)
     }
 }
