@@ -16,7 +16,6 @@
     <string name="draw">Draw</string>
     <string name="filter">Filter</string>
     <string name="edit">Edit</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="im_a_guest">Im a guest</string>
     <string name="permission_to_write">Permission to write to the device memory has not been granted</string>
@@ -34,4 +33,26 @@
     <string name="color">Color</string>
     <string name="size">Size</string>
     <string name="eraser">Eraser</string>
+    <string name="theme">Theme</string>
+    <string name="columns">Columns</string>
+    <string name="show_dates">Show dates</string>
+    <string name="yes">Yes</string>
+    <string-array name="image_format">
+        <item>PNG</item>
+        <item>JPG</item>
+    </string-array>
+    <string-array name="themes">
+        <item>Dark</item>
+        <item>Light</item>
+        <item>System</item>
+    </string-array>
+    <string-array name="columns">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="show_dates">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
 </resources>

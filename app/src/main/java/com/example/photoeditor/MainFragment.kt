@@ -137,7 +137,7 @@ class MainFragment : Fragment() {
     // Метод очищения значения из SearchView и сворачиваем его
     private fun cleanSearchView() {
         searchView.post {
-            searchView.setIconified(true)
+            searchView.isIconified = true
             searchView.clearFocus()
         }
     }

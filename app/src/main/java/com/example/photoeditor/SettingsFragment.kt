@@ -38,16 +38,10 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Инициализация SharedPreferences
-        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-        // Установка адаптеров для Spinner
-        val imageFormatOptions = arrayOf("PNG", "JPG")
-        val imageFormatAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, imageFormatOptions)
-        imageFormatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerImageFormat.adapter = imageFormatAdapter
-
-        // Загрузка сохраненного формата изображения и установка его в Spinner
-        loadSavedImageFormat()
+        // Выгрузка и загрузка параметров
+        loadSettings()
 
         // Установка обработчика нажатия для кнопки "Назад"
         binding.buttonBack.setOnClickListener {
@@ -56,18 +50,58 @@ class SettingsFragment : Fragment() {
 
         // Установка обработчика нажатия для кнопки "Сохранить"
         binding.buttonSave.setOnClickListener {
-            save()
+            saveSettings()
         }
     }
 
-
-    // Функция для загрузки сохраненного формата изображения
-    private fun loadSavedImageFormat() {
+    private fun loadSettings() {
+        // Загрузка сохраненного формата изображения и установка его в Spinner
         val savedImageFormat = sharedPreferences.getString("image_format", null)
         if (savedImageFormat != null) {
-            @Suppress("UNCHECKED_CAST") val position = (binding.spinnerImageFormat.adapter as ArrayAdapter<String>).getPosition(savedImageFormat)
+            val imageFormatOptions = resources.getStringArray(R.array.image_format)
+            val position = imageFormatOptions.indexOf(savedImageFormat)
             binding.spinnerImageFormat.setSelection(position)
         }
+
+        // Загрузка сохраненной темы и установка её в Spinner
+        val savedTheme = sharedPreferences.getString("theme", null)
+        if (savedTheme != null) {
+            val themeOptions = resources.getStringArray(R.array.themes)
+            val position = themeOptions.indexOf(savedTheme)
+            binding.spinnerTheme.setSelection(position)
+        }
+
+        // Загрузка сохраненного количества элементов в строке и установка его в Spinner
+        val savedColumns = sharedPreferences.getInt("columns", 2)
+        binding.spinnerColumns.setSelection(savedColumns - 1)
+
+        // Загрузка сохраненного показа дат и установка его в Spinner
+        val savedShowDates = sharedPreferences.getBoolean("show_dates", true)
+        binding.spinnerShowDates.setSelection(if (savedShowDates) 0 else 1)
+    }
+
+    private fun saveSettings() {
+        // Получение выбранных значений из Spinner
+        val selectedImageFormat = binding.spinnerImageFormat.selectedItem.toString()
+        val selectedTheme = binding.spinnerTheme.selectedItem.toString()
+        val selectedColumns = binding.spinnerColumns.selectedItem.toString().toInt()
+        val selectedShowDates = binding.spinnerShowDates.selectedItem.toString() == getString(R.string.yes)
+
+        // Сохранение значений в SharedPreferences
+        with(sharedPreferences.edit()) {
+            putString("image_format", selectedImageFormat)
+            putString("theme", selectedTheme)
+            putInt("columns", selectedColumns)
+            putBoolean("show_dates", selectedShowDates)
+            apply()
+        }
+
+        // Подтверждение сохранения
+        Toast.makeText(
+            context,
+            getString(R.string.settings_saved),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     // Функция для обработки возврата
@@ -80,23 +114,5 @@ class SettingsFragment : Fragment() {
             .addToBackStack(null)
             // Завершение транзакции
             .commit()
-    }
-
-    private fun save() {
-        // Получение выбранных значений из Spinner
-        val selectedImageFormat = binding.spinnerImageFormat.selectedItem.toString()
-
-        // Сохранение значений в SharedPreferences
-        with(sharedPreferences.edit()) {
-            putString("image_format", selectedImageFormat)
-            apply()
-        }
-
-        // Подтверждение сохранения
-        Toast.makeText(
-            context,
-            getString(R.string.settings_saved),
-            Toast.LENGTH_SHORT)
-            .show()
     }
 }

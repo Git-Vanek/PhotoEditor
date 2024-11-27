@@ -1,7 +1,9 @@
 package com.example.photoeditor
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -40,9 +42,17 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     // Адаптер для RecyclerView
     private lateinit var photoAdapter: PhotoAdapter
 
+    // Ключ для SharedPreferences
+    private val settings: String = "my_settings"
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // Переменные параметров
+    private var gridCounnt: Int = 2
+
     companion object {
         private const val REQUEST_CODE_PICK_PHOTO = 1
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,13 +71,18 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Инициализация SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
+        // Получение параметров
+        gridCounnt = sharedPreferences.getInt("grid_count", 2)
+
         // Инициализация RecyclerView
         val rv: RecyclerView = binding.recyclerView
         photoAdapter = PhotoAdapter(photoList) { photo ->
             openPhotoActivity(photo)
         }
         rv.adapter = photoAdapter
-        rv.layoutManager = GridLayoutManager(context, 3) // 3 элемента в строке
+        rv.layoutManager = GridLayoutManager(context, gridCounnt)
     }
 
     // Метод для фильтрации списка фотографий
