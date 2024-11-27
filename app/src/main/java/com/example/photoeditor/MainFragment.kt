@@ -23,6 +23,9 @@ class MainFragment : Fragment() {
     // Список фотографий
     private lateinit var photoList: MutableList<Photo>
 
+    // Строка поиска
+    private lateinit var searchView: SearchView
+
     // Переменные для работы с вкладками
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
@@ -45,19 +48,59 @@ class MainFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Создаем список фотографий
         photoList = buildPhotoList()
+        // Создаем адаптер для ViewPager2, передавая ему текущий фрагмент и список фотографий
         val adapter = PhotoPagerAdapter(this, photoList)
+        // Инициализируем TabLayout из разметки
         tabLayout = binding.tabLayout
+        // Инициализируем ViewPager2 из разметки
         viewPager = binding.viewPager
+        // Устанавливаем адаптер для ViewPager2
         viewPager.adapter = adapter
+        // Создаем TabLayoutMediator для синхронизации TabLayout и ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            // Устанавливаем текст для каждой вкладки в зависимости от позиции
             tab.text = when (position) {
-                0 -> "Общий"
-                1 -> "Мой"
-                2 -> "Весь"
-                else -> ""
+                0 -> "Общий" // Текст для первой вкладки
+                1 -> "Мой" // Текст для второй вкладки
+                2 -> "Весь" // Текст для третьей вкладки
+                else -> "" // Текст для других позиций (если есть)
             }
-        }.attach()
+        }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
+
+        // Настройка SearchView
+        searchView = binding.searchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Логика для обработки отправки запроса
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Логика для фильтрации списка при изменении текста
+                if (newText != null) {
+                    if (adapter.pageTotalPhotoFragment.isVisible) adapter.pageTotalPhotoFragment.filterList(newText)
+                    if (adapter.pageMyPhotoFragment.isVisible) adapter.pageMyPhotoFragment.filterList(newText)
+                    if (adapter.pageAllPhotoFragment.isVisible) adapter.pageAllPhotoFragment.filterList(newText)
+                }
+                return true
+            }
+        })
+
+        // Регистрируем обратный вызов для отслеживания изменений страницы в ViewPager2
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            // Этот метод вызывается, когда выбранная страница изменяется
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                // В зависимости от позиции выбранной страницы выполняем соответствующие действия
+                when (position) {
+                    0 -> cleanSearchView()
+                    1 -> cleanSearchView()
+                    2 -> cleanSearchView()
+                }
+            }
+        })
 
         // Установка обработчика нажатия для кнопки информация пользователя
         binding.buttonUserInfo.setOnClickListener {
@@ -88,6 +131,14 @@ class MainFragment : Fragment() {
             if (adapter.pageTotalPhotoFragment.isVisible) adapter.pageTotalPhotoFragment.delete()
             if (adapter.pageMyPhotoFragment.isVisible) adapter.pageMyPhotoFragment.delete()
             if (adapter.pageAllPhotoFragment.isVisible) adapter.pageAllPhotoFragment.delete()
+        }
+    }
+
+    // Метод очищения значения из SearchView и сворачиваем его
+    private fun cleanSearchView() {
+        searchView.post {
+            searchView.setIconified(true)
+            searchView.clearFocus()
         }
     }
 

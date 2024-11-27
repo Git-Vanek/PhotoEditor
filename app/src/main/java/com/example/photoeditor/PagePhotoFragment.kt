@@ -61,23 +61,6 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Настройка SearchView
-        val searchView: SearchView = binding.searchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // Логика для обработки отправки запроса
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Логика для фильтрации списка при изменении текста
-                if (newText != null) {
-                    filterList(newText)
-                }
-                return true
-            }
-        })
-
         // Инициализация RecyclerView
         val rv: RecyclerView = binding.recyclerView
         photoAdapter = PhotoAdapter(photoList) { photo ->
@@ -88,7 +71,7 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     }
 
     // Метод для фильтрации списка фотографий
-    private fun filterList(query: String) {
+    public fun filterList(query: String) {
         val filteredList = photoList.filter { photo ->
             photo.createdAt.toString().contains(query, ignoreCase = true)
         }
