@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.photoeditor.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment() {
@@ -96,12 +97,23 @@ class SettingsFragment : Fragment() {
             apply()
         }
 
+        // Установка темы после сохранения настроек
+        setAppTheme(selectedTheme)
+
         // Подтверждение сохранения
         Toast.makeText(
             context,
             getString(R.string.settings_saved),
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    private fun setAppTheme(theme: String) {
+        when (theme) {
+            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
     }
 
     // Функция для обработки возврата
