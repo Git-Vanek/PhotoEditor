@@ -108,6 +108,7 @@ class SettingsFragment : Fragment() {
         ).show()
     }
 
+    // Метод для установки темы
     private fun setAppTheme(theme: String) {
         when (theme) {
             "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)

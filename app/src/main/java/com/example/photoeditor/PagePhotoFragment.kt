@@ -18,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photoeditor.databinding.FragmentPagePhotoBinding
@@ -47,7 +46,9 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     private lateinit var sharedPreferences: SharedPreferences
 
     // Переменные параметров
+    private var imageFormat: String = "jpg"
     private var gridCounnt: Int = 2
+    private var showDates: Boolean = false
 
     companion object {
         private const val REQUEST_CODE_PICK_PHOTO = 1
@@ -74,19 +75,28 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
         // Инициализация SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
         // Получение параметров
+        imageFormat = sharedPreferences.getString("image_format", "jpg").toString()
         gridCounnt = sharedPreferences.getInt("grid_count", 2)
+        showDates = sharedPreferences.getBoolean("show_dates", false)
 
         // Инициализация RecyclerView
         val rv: RecyclerView = binding.recyclerView
         photoAdapter = PhotoAdapter(photoList) { photo ->
             openPhotoActivity(photo)
         }
-        rv.adapter = photoAdapter
-        rv.layoutManager = GridLayoutManager(context, gridCounnt)
+        if (showDates) {
+            // Установка RecyclerView с датами
+
+        }
+        else {
+            // Установка RecyclerView без дат
+            rv.adapter = photoAdapter
+            rv.layoutManager = GridLayoutManager(context, gridCounnt)
+        }
     }
 
     // Метод для фильтрации списка фотографий
-    public fun filterList(query: String) {
+    fun filterList(query: String) {
         val filteredList = photoList.filter { photo ->
             photo.createdAt.toString().contains(query, ignoreCase = true)
         }
@@ -102,11 +112,11 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
 
     // Метод для добавления элемента
     @RequiresApi(Build.VERSION_CODES.O)
-    public fun add() {
+    fun add() {
         // Создаем диалоговое окно для выбора источника фотографии
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
-        builder.setTitle("Выберите источник фотографии")
-        builder.setItems(arrayOf("С устройства", "С интернета")) { _, which ->
+        builder.setTitle("Choose Photo Source")
+        builder.setItems(arrayOf("From Device", "From Internet")) { _, which ->
             when (which) {
                 0 -> pickPhotoFromDevice()
                 1 -> pickPhotoFromInternet()
@@ -141,37 +151,36 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
         val input = EditText(context)
         input.inputType = InputType.TYPE_TEXT_VARIATION_URI
-        builder.setTitle("Введите URL фотографии")
+        builder.setTitle("Enter Photo URL")
         builder.setView(input)
         builder.setPositiveButton("OK") { _, _ ->
             val url = input.text.toString()
             photoList.add(Photo("8", "8", false, url, LocalDate.now()))
         }
-        builder.setNegativeButton("Отмена") { dialog, _ ->
+        builder.setNegativeButton("Cancel") { dialog, _ ->
             dialog.cancel()
         }
         builder.show()
     }
 
     // Метод для загрузки элемента
-    public fun load() {
+    fun load() {
         val selectedItems = photoAdapter.getSelectedItems()
         if (selectedItems.isEmpty()) {
             Toast.makeText(
                 requireContext(),
-                "Ни одна фотография не выбрана",
-                Toast.LENGTH_LONG)
-                .show()
+                "No photos selected",
+                Toast.LENGTH_LONG
+            ).show()
         } else {
             for (selectedItem in selectedItems) {
                 if (!selectedItem.original) {
-                    // Сохранение фотографии на устройство
+                    // Save the photo to the device
                     saveImageToDevice(selectedItem)
-                }
-                else {
+                } else {
                     Toast.makeText(
                         requireContext(),
-                        "Фотография уже на вашем устройстве.",
+                        "The photo is already on your device.",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -185,7 +194,7 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
         val target = object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 if (bitmap != null) {
-                    val fileName = "image_${System.currentTimeMillis()}.jpg"
+                    val fileName = "image_${System.currentTimeMillis()}." + imageFormat
                     val file = File(fragment.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
                     try {
                         val outputStream = FileOutputStream(file)
@@ -194,16 +203,16 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
                         outputStream.close()
                         Toast.makeText(
                             fragment,
-                            "Изображение сохранено: ${file.absolutePath}",
-                            Toast.LENGTH_SHORT)
-                            .show()
+                            "Image saved: ${file.absolutePath}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } catch (e: IOException) {
                         e.printStackTrace()
                         Toast.makeText(
                             fragment,
-                            "Ошибка при сохранении изображения",
-                            Toast.LENGTH_SHORT)
-                            .show()
+                            "Error saving image",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -211,9 +220,9 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 Toast.makeText(
                     fragment,
-                    "Ошибка при загрузке изображения",
-                    Toast.LENGTH_SHORT)
-                    .show()
+                    "Error loading image",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
@@ -225,23 +234,23 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     }
 
     // Метод для удаления элемента
-    public fun delete() {
+    fun delete() {
         val selectedItems = photoAdapter.getSelectedItems()
         if (selectedItems.isEmpty()) {
             Toast.makeText(
                 requireContext(),
-                "Ни одна фотография не выбрана",
+                "No photos selected",
                 Toast.LENGTH_LONG
             ).show()
         } else {
             MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
-                .setTitle("Подтверждение удаления")
-                .setMessage("Вы действительно хотите удалить выбранные фотографии?")
-                .setPositiveButton("Да") { _, _ ->
+                .setTitle("Confirm Deletion")
+                .setMessage("Are you sure you want to delete the selected photos?")
+                .setPositiveButton("Yes") { _, _ ->
                     photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems }.toMutableList())
                     photoAdapter.clearSelection()
                 }
-                .setNegativeButton("Нет", null)
+                .setNegativeButton("No", null)
                 .show()
         }
     }

@@ -37,9 +37,10 @@
     <string name="columns">Columns</string>
     <string name="show_dates">Show dates</string>
     <string name="yes">Yes</string>
+    <string name="logo">Logo</string>
     <string-array name="image_format">
-        <item>PNG</item>
-        <item>JPG</item>
+        <item>png</item>
+        <item>jpg</item>
     </string-array>
     <string-array name="themes">
         <item>Dark</item>

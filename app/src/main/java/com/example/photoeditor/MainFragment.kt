@@ -62,9 +62,9 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             // Устанавливаем текст для каждой вкладки в зависимости от позиции
             tab.text = when (position) {
-                0 -> "Общий" // Текст для первой вкладки
-                1 -> "Мой" // Текст для второй вкладки
-                2 -> "Весь" // Текст для третьей вкладки
+                0 -> "Total" // Текст для первой вкладки
+                1 -> "My" // Текст для второй вкладки
+                2 -> "All" // Текст для третьей вкладки
                 else -> "" // Текст для других позиций (если есть)
             }
         }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
