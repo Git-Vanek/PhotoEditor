@@ -39,7 +39,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Инициализация SharedPreferences
-        sharedPreferences = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
 
         // Выгрузка и загрузка параметров
         loadSettings()
@@ -106,6 +106,9 @@ class SettingsFragment : Fragment() {
             getString(R.string.settings_saved),
             Toast.LENGTH_SHORT
         ).show()
+
+        // Возврат
+        back()
     }
 
     // Метод для установки темы

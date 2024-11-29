@@ -19,6 +19,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photoeditor.databinding.FragmentPagePhotoBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -29,17 +30,18 @@ import java.io.IOException
 import java.time.LocalDate
 
 @Suppress("DEPRECATION")
-class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
+class PagePhotoFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentPagePhotoBinding
     // Геттер для переменной binding
     private val binding get() = _binding
 
     // Список фотографий
-    private var photoList: MutableList<Photo> = list
+    private lateinit var photoList: MutableList<Photo>
 
-    // Адаптер для RecyclerView
+    // Адаптеры для RecyclerView
     private lateinit var photoAdapter: PhotoAdapter
+    private lateinit var photoWithDatesAdapter: PhotoWithDatesAdapter
 
     // Ключ для SharedPreferences
     private val settings: String = "my_settings"
@@ -52,6 +54,22 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
 
     companion object {
         private const val REQUEST_CODE_PICK_PHOTO = 1
+        private const val ARG_PHOTO_LIST = "photo_list"
+
+        fun newInstance(list: MutableList<Photo>): PagePhotoFragment {
+            val fragment = PagePhotoFragment()
+            val args = Bundle()
+            args.putSerializable(ARG_PHOTO_LIST, ArrayList(list))
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            photoList = it.getSerializable(ARG_PHOTO_LIST) as MutableList<Photo>
+        }
     }
 
     override fun onCreateView(
@@ -76,17 +94,19 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
         sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
         // Получение параметров
         imageFormat = sharedPreferences.getString("image_format", "jpg").toString()
-        gridCounnt = sharedPreferences.getInt("grid_count", 2)
+        gridCounnt = sharedPreferences.getInt("columns", 2)
         showDates = sharedPreferences.getBoolean("show_dates", false)
 
         // Инициализация RecyclerView
         val rv: RecyclerView = binding.recyclerView
-        photoAdapter = PhotoAdapter(photoList) { photo ->
+        photoAdapter = PhotoAdapter(photoList, context) { photo ->
             openPhotoActivity(photo)
         }
         if (showDates) {
             // Установка RecyclerView с датами
-
+            photoWithDatesAdapter = PhotoWithDatesAdapter(photoAdapter, gridCounnt, context)
+            rv.adapter = photoWithDatesAdapter
+            rv.layoutManager = LinearLayoutManager(context)
         }
         else {
             // Установка RecyclerView без дат
@@ -97,10 +117,19 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
 
     // Метод для фильтрации списка фотографий
     fun filterList(query: String) {
-        val filteredList = photoList.filter { photo ->
-            photo.createdAt.toString().contains(query, ignoreCase = true)
+        if (showDates) {
+            val filteredList = photoList.filter { photo ->
+                photo.createdAt.toString().contains(query, ignoreCase = true)
+            }
+            photoAdapter.filterList(filteredList.toMutableList())
         }
-        photoAdapter.filterList(filteredList.toMutableList())
+        else {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.func_not_available),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     // Метод для перехода на редактирование элемента
@@ -113,16 +142,25 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
     // Метод для добавления элемента
     @RequiresApi(Build.VERSION_CODES.O)
     fun add() {
-        // Создаем диалоговое окно для выбора источника фотографии
-        val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
-        builder.setTitle("Choose Photo Source")
-        builder.setItems(arrayOf("From Device", "From Internet")) { _, which ->
-            when (which) {
-                0 -> pickPhotoFromDevice()
-                1 -> pickPhotoFromInternet()
+        if (showDates) {
+            // Создаем диалоговое окно для выбора источника фотографии
+            val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
+            builder.setTitle(getString(R.string.choose_photo_source))
+            builder.setItems(arrayOf(getString(R.string.from_device), getString(R.string.from_internet))) { _, which ->
+                when (which) {
+                    0 -> pickPhotoFromDevice()
+                    1 -> pickPhotoFromInternet()
+                }
             }
+            builder.show()
         }
-        builder.show()
+        else {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.func_not_available),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     // Метод получения фотографии с устройства
@@ -151,13 +189,13 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
         val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
         val input = EditText(context)
         input.inputType = InputType.TYPE_TEXT_VARIATION_URI
-        builder.setTitle("Enter Photo URL")
+        builder.setTitle(getString(R.string.enter_photo_url))
         builder.setView(input)
-        builder.setPositiveButton("OK") { _, _ ->
+        builder.setPositiveButton(getString(R.string.ok)) { _, _ ->
             val url = input.text.toString()
-            photoList.add(Photo("8", "8", false, url, LocalDate.now()))
+            photoAdapter.addItem(Photo("8", "8", false, url, LocalDate.now()))
         }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
             dialog.cancel()
         }
         builder.show()
@@ -165,26 +203,35 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
 
     // Метод для загрузки элемента
     fun load() {
-        val selectedItems = photoAdapter.getSelectedItems()
-        if (selectedItems.isEmpty()) {
-            Toast.makeText(
-                requireContext(),
-                "No photos selected",
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            for (selectedItem in selectedItems) {
-                if (!selectedItem.original) {
-                    // Save the photo to the device
-                    saveImageToDevice(selectedItem)
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "The photo is already on your device.",
-                        Toast.LENGTH_LONG
-                    ).show()
+        if (showDates) {
+            val selectedItems = photoAdapter.getSelectedItems()
+            if (selectedItems.isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_photos_selected,
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                for (selectedItem in selectedItems) {
+                    if (!selectedItem.original) {
+                        // Save the photo to the device
+                        saveImageToDevice(selectedItem)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.the_photo_is_already_on_your_device),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
+        }
+        else {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.func_not_available),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -203,14 +250,14 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
                         outputStream.close()
                         Toast.makeText(
                             fragment,
-                            "Image saved: ${file.absolutePath}",
+                            getString(R.string.image_saved) + {file.absolutePath},
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: IOException) {
                         e.printStackTrace()
                         Toast.makeText(
                             fragment,
-                            "Error saving image",
+                            getString(R.string.error_saving_image),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -220,7 +267,7 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 Toast.makeText(
                     fragment,
-                    "Error loading image",
+                    getString(R.string.error_loading_image),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -235,23 +282,33 @@ class PagePhotoFragment(list: MutableList<Photo>) : Fragment() {
 
     // Метод для удаления элемента
     fun delete() {
-        val selectedItems = photoAdapter.getSelectedItems()
-        if (selectedItems.isEmpty()) {
+        if (showDates) {
+            val selectedItems = photoAdapter.getSelectedItems()
+            if (selectedItems.isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.no_photos_selected),
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
+                    .setTitle(getString(R.string.confirm_deletion))
+                    .setMessage(getString(R.string.want_to_delete))
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems }
+                            .toMutableList())
+                        photoAdapter.clearSelection()
+                    }
+                    .setNegativeButton(getString(R.string.no), null)
+                    .show()
+            }
+        }
+        else {
             Toast.makeText(
                 requireContext(),
-                "No photos selected",
+                getString(R.string.func_not_available),
                 Toast.LENGTH_LONG
             ).show()
-        } else {
-            MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
-                .setTitle("Confirm Deletion")
-                .setMessage("Are you sure you want to delete the selected photos?")
-                .setPositiveButton("Yes") { _, _ ->
-                    photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems }.toMutableList())
-                    photoAdapter.clearSelection()
-                }
-                .setNegativeButton("No", null)
-                .show()
         }
     }
 }

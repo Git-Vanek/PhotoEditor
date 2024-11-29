@@ -28,6 +28,11 @@ class MainActivity : AppCompatActivity() {
         checkPermissions()
         // Создание экземпляра фрагмента MainFragment
         val mainFragment = MainFragment()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.mainContent, mainFragment)
+                .commit()
+        }
         // Начало транзакции фрагмента
         supportFragmentManager.beginTransaction()
             // Замена текущего фрагмента на MainFragment

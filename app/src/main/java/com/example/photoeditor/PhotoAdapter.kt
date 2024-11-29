@@ -1,16 +1,19 @@
 package com.example.photoeditor
 
+import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
 // Адаптер для RecyclerView, который работает с фотографиями
-class PhotoAdapter(var dataset: MutableList<Photo>, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
+class PhotoAdapter(var dataset: MutableList<Photo>, private val context: Context?, private val itemClickListener: (Photo) -> Unit) : RecyclerView.Adapter<PhotoAdapter.ViewHolder>() {
 
     // Список выбранных элементов
     private val selectedItems = mutableListOf<Photo>()
@@ -47,19 +50,60 @@ class PhotoAdapter(var dataset: MutableList<Photo>, private val itemClickListene
             // Загрузка изображения с устройства
             Picasso.get()
                 .load(Uri.parse(photo.path))
-                .into(viewHolder.image)
+                .error(R.drawable.ic_launcher_background) // Изображение для ошибки
+                .placeholder(R.drawable.ic_launcher_foreground) // Заглушка
+                .into(viewHolder.image, object : Callback {
+                    override fun onSuccess() {
+                        // Изображение успешно загружено
+                        // Обработка нажатия на изображение
+                        viewHolder.image.setOnClickListener {
+                            // Переход на просмотр изображения
+                            itemClickListener(photo)
+                        }
+                    }
+
+                    override fun onError(e: Exception?) {
+                        // Произошла ошибка при загрузке изображения
+                        // Обработка нажатия на изображение
+                        viewHolder.image.setOnClickListener {
+                            // Вывод сообщения с ошибкой
+                            Toast.makeText(
+                                context,
+                                "The photo has not been uploaded.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                })
         } else {
             // Загрузка изображения из интернета
             Picasso.get()
                 .load(photo.path)
                 .error(R.drawable.ic_launcher_background) // Изображение для ошибки
                 .placeholder(R.drawable.ic_launcher_foreground) // Заглушка
-                .into(viewHolder.image)
-        }
+                .into(viewHolder.image, object : Callback {
+                    override fun onSuccess() {
+                        // Изображение успешно загружено
+                        // Обработка нажатия на изображение
+                        viewHolder.image.setOnClickListener {
+                            // Переход на просмотр изображения
+                            itemClickListener(photo)
+                        }
+                    }
 
-        // Обработка нажатия на изображение
-        viewHolder.image.setOnClickListener {
-            itemClickListener(photo)
+                    override fun onError(e: Exception?) {
+                        // Произошла ошибка при загрузке изображения
+                        // Обработка нажатия на изображение
+                        viewHolder.image.setOnClickListener {
+                            // Вывод сообщения с ошибкой
+                            Toast.makeText(
+                                context,
+                                "The photo has not been uploaded.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                })
         }
 
         // Установка состояния CheckBox в зависимости от выбранных элементов
