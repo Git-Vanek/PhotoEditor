@@ -62,9 +62,9 @@ class MainFragment : Fragment() {
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             // Устанавливаем текст для каждой вкладки в зависимости от позиции
             tab.text = when (position) {
-                0 -> "Total" // Текст для первой вкладки
-                1 -> "My" // Текст для второй вкладки
-                2 -> "All" // Текст для третьей вкладки
+                0 -> getString(R.string.general) // Текст для первой вкладки
+                1 -> getString(R.string.my) // Текст для второй вкладки
+                2 -> getString(R.string.all) // Текст для третьей вкладки
                 else -> "" // Текст для других позиций (если есть)
             }
         }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
@@ -114,23 +114,41 @@ class MainFragment : Fragment() {
 
         // Установка обработчика нажатия для кнопки добавления
         binding.buttonAdd.setOnClickListener {
-            if (adapter.pageTotalPhotoFragment.isVisible) adapter.pageTotalPhotoFragment.add()
-            if (adapter.pageMyPhotoFragment.isVisible) adapter.pageMyPhotoFragment.add()
-            if (adapter.pageAllPhotoFragment.isVisible) adapter.pageAllPhotoFragment.add()
+            if (adapter.pageTotalPhotoFragment.isVisible) {
+                adapter.pageTotalPhotoFragment.add()
+            }
+            if (adapter.pageMyPhotoFragment.isVisible) {
+                adapter.pageMyPhotoFragment.add()
+            }
+            if (adapter.pageAllPhotoFragment.isVisible) {
+                adapter.pageAllPhotoFragment.add()
+            }
         }
 
         // Установка обработчика нажатия для кнопки загрузки
         binding.buttonLoad.setOnClickListener {
-            if (adapter.pageTotalPhotoFragment.isVisible) adapter.pageTotalPhotoFragment.load()
-            if (adapter.pageMyPhotoFragment.isVisible) adapter.pageMyPhotoFragment.load()
-            if (adapter.pageAllPhotoFragment.isVisible) adapter.pageAllPhotoFragment.load()
+            if (adapter.pageTotalPhotoFragment.isVisible) {
+                adapter.pageTotalPhotoFragment.load()
+            }
+            if (adapter.pageMyPhotoFragment.isVisible) {
+                adapter.pageMyPhotoFragment.load()
+            }
+            if (adapter.pageAllPhotoFragment.isVisible) {
+                adapter.pageAllPhotoFragment.load()
+            }
         }
 
         // Установка обработчика нажатия для кнопки удаления
         binding.buttonDelete.setOnClickListener {
-            if (adapter.pageTotalPhotoFragment.isVisible) adapter.pageTotalPhotoFragment.delete()
-            if (adapter.pageMyPhotoFragment.isVisible) adapter.pageMyPhotoFragment.delete()
-            if (adapter.pageAllPhotoFragment.isVisible) adapter.pageAllPhotoFragment.delete()
+            if (adapter.pageTotalPhotoFragment.isVisible) {
+                adapter.pageTotalPhotoFragment.delete()
+            }
+            if (adapter.pageMyPhotoFragment.isVisible) {
+                adapter.pageMyPhotoFragment.delete()
+            }
+            if (adapter.pageAllPhotoFragment.isVisible) {
+                adapter.pageAllPhotoFragment.delete()
+            }
         }
     }
 

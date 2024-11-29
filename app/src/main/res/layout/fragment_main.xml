@@ -36,8 +36,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:queryHint="Search"
-                    android:iconifiedByDefault="false"
-                    app:searchIcon="@drawable/ic_search"/>
+                    android:iconifiedByDefault="false"/>
 
                 <!-- Кнопка "Информация пользователя" -->
                 <ImageButton
@@ -67,6 +66,44 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- Панель с кнопками "Добавить", "Загрузить" и "Удалить" -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <!-- Кнопка "Добавить" -->
+                <ImageButton
+                    android:id="@+id/buttonAdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/add"
+                    android:src="@drawable/ic_add"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+                <!-- Кнопка "Загрузить" -->
+                <ImageButton
+                    android:id="@+id/buttonLoad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/load"
+                    android:src="@drawable/ic_download"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_marginStart="16dp" />
+
+                <!-- Кнопка "Удалить" -->
+                <ImageButton
+                    android:id="@+id/buttonDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/delete"
+                    android:src="@drawable/ic_delete"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_marginStart="16dp" />
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -76,46 +113,13 @@
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/tabLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:background="@color/background"/>
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-            </LinearLayout>
-
-            <!-- Нижняя панель с кнопками "Добавить", "Загрузить" и "Удалить" -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_gravity="bottom"
-                android:padding="16dp">
-
-                <!-- Кнопка "Добавить" -->
-                <Button
-                    android:id="@+id/buttonAdd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add"
-                    android:layout_marginEnd="16dp" />
-
-                <!-- Кнопка "Загрузить" -->
-                <Button
-                    android:id="@+id/buttonLoad"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/load"
-                    android:layout_marginEnd="16dp" />
-
-                <!-- Кнопка "Удалить" -->
-                <Button
-                    android:id="@+id/buttonDelete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/delete"
-                    android:layout_marginEnd="16dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

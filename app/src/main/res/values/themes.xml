@@ -7,6 +7,8 @@
         <item name="materialButtonStyle">@style/Widget.PhotoEditor.Button</item>
         <!-- Стили MaterialAlertDialogBuilder -->
         <item name="alertDialogTheme">@style/Widget.PhotoEditor.AlertDialog</item>
+        <!-- Стили MaterialAlertDialogBuilder -->
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
     </style>
 
     <style name="LaunchScreen" parent="Base.Theme.PhotoEditor">
