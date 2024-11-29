@@ -53,6 +53,7 @@
     <string name="from_internet">From Internet</string>
     <string name="from_device">From Device</string>
     <string name="choose_photo_source">Choose Photo Source</string>
+    <string name="take_photo">Take photo</string>
     <string-array name="image_format">
         <item>png</item>
         <item>jpg</item>

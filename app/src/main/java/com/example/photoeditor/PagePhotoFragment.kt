@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -17,7 +18,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +54,9 @@ class PagePhotoFragment : Fragment() {
     private var imageFormat: String = "jpg"
     private var gridCounnt: Int = 2
     private var showDates: Boolean = false
+
+    // Переменая хранения пути для сделанной фотографии
+    private var currentPhotoPath: String? = null
 
     companion object {
         private const val REQUEST_CODE_PICK_PHOTO = 1
@@ -117,7 +123,7 @@ class PagePhotoFragment : Fragment() {
 
     // Метод для фильтрации списка фотографий
     fun filterList(query: String) {
-        if (showDates) {
+        if (!showDates) {
             val filteredList = photoList.filter { photo ->
                 photo.createdAt.toString().contains(query, ignoreCase = true)
             }
@@ -142,19 +148,19 @@ class PagePhotoFragment : Fragment() {
     // Метод для добавления элемента
     @RequiresApi(Build.VERSION_CODES.O)
     fun add() {
-        if (showDates) {
+        if (!showDates) {
             // Создаем диалоговое окно для выбора источника фотографии
             val builder = MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
             builder.setTitle(getString(R.string.choose_photo_source))
-            builder.setItems(arrayOf(getString(R.string.from_device), getString(R.string.from_internet))) { _, which ->
+            builder.setItems(arrayOf(getString(R.string.from_device), getString(R.string.from_internet), getString(R.string.take_photo))) { _, which ->
                 when (which) {
                     0 -> pickPhotoFromDevice()
                     1 -> pickPhotoFromInternet()
+                    2 -> takePhoto()
                 }
             }
             builder.show()
-        }
-        else {
+        } else {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.func_not_available),
@@ -201,9 +207,54 @@ class PagePhotoFragment : Fragment() {
         builder.show()
     }
 
+    // Метод для создания фотографии с использованием камеры
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun takePhoto() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
+            val photoFile: File? = try {
+                createImageFile()
+            } catch (ex: Exception) {
+                null
+            }
+            photoFile?.also {
+                val photoURI: Uri = FileProvider.getUriForFile(requireContext(), "com.example.photoeditor.fileprovider", it)
+                currentPhotoPath = it.absolutePath
+                takePicture.launch(photoURI)
+            }
+        } else {
+            Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @Throws(Exception::class)
+    private fun createImageFile(): File {
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "img_${System.currentTimeMillis()}_", /* prefix */
+            "." + imageFormat, /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Сохраняем путь к файлу для последующего использования
+            currentPhotoPath = absolutePath
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success: Boolean ->
+        if (success) {
+            // Загрузка изображения с устройства
+            val photoUri = FileProvider.getUriForFile(requireContext(), "com.example.photoeditor.fileprovider", File(
+                currentPhotoPath.toString()
+            ))
+            photoAdapter.addItem(Photo("9", "9", true, photoUri.toString(), LocalDate.now()))
+        }
+    }
+
     // Метод для загрузки элемента
     fun load() {
-        if (showDates) {
+        if (!showDates) {
             val selectedItems = photoAdapter.getSelectedItems()
             if (selectedItems.isEmpty()) {
                 Toast.makeText(
@@ -282,7 +333,7 @@ class PagePhotoFragment : Fragment() {
 
     // Метод для удаления элемента
     fun delete() {
-        if (showDates) {
+        if (!showDates) {
             val selectedItems = photoAdapter.getSelectedItems()
             if (selectedItems.isEmpty()) {
                 Toast.makeText(
