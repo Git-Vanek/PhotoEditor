@@ -50,7 +50,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_gravity="center"
                         android:text="@string/photo_edit"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/onPrimary"
                         android:textStyle="bold"/>
 
                     <ImageButton

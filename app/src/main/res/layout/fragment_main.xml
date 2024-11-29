@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:queryHint="Search"
-                    android:iconifiedByDefault="false"/>
+                    android:iconifiedByDefault="false" />
 
                 <!-- Кнопка "Информация пользователя" -->
                 <ImageButton
@@ -72,7 +72,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="8dp">
+                android:padding="4dp"
+                android:background="@color/secondary">
 
                 <!-- Кнопка "Добавить" -->
                 <ImageButton
@@ -114,7 +115,9 @@
                     android:id="@+id/tabLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/background"/>
+                    android:background="@color/secondary"
+                    app:tabTextColor="@color/onSecondary"
+                    app:tabSelectedTextColor="@color/primary"/>
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPager"

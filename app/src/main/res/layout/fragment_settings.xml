@@ -45,7 +45,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_gravity="center"
                     android:text="@string/settings"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/onPrimary"
                     android:textStyle="bold"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -69,14 +69,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/image_format"
                     android:textSize="18sp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/onBackground" />
 
                 <Spinner
                     android:id="@+id/spinnerImageFormat"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:entries="@array/image_format" />
+                    android:entries="@array/image_format"
+                    android:textColor="@color/onBackground" />
             </LinearLayout>
 
             <!-- Контейнер для выбора темы -->
@@ -91,14 +93,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/theme"
                     android:textSize="18sp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/onBackground" />
 
                 <Spinner
                     android:id="@+id/spinnerTheme"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:entries="@array/themes" />
+                    android:entries="@array/themes"
+                    android:textColor="@color/onBackground" />
             </LinearLayout>
 
             <!-- Контейнер для выбора количества элементов в строке -->
@@ -113,14 +117,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/columns"
                     android:textSize="18sp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/onBackground" />
 
                 <Spinner
                     android:id="@+id/spinnerColumns"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:entries="@array/columns" />
+                    android:entries="@array/columns"
+                    android:textColor="@color/onBackground" />
             </LinearLayout>
 
             <!-- Контейнер для выбора показа дат -->
@@ -135,14 +141,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/show_dates"
                     android:textSize="18sp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/onBackground" />
 
                 <Spinner
                     android:id="@+id/spinnerShowDates"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:entries="@array/show_dates" />
+                    android:entries="@array/show_dates"
+                    android:textColor="@color/onBackground" />
             </LinearLayout>
 
             <!-- Кнопка для сохранения настроек -->

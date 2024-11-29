@@ -44,7 +44,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_gravity="center"
                     android:text="@string/photo_view"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/onPrimary"
                     android:textStyle="bold"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
