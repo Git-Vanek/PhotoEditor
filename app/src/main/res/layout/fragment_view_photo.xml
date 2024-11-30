@@ -61,7 +61,8 @@
                 android:id="@+id/photoView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerInside" />
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true" />
         </LinearLayout>
 
         <!-- Нижняя панель с кнопками "Рисовать", "Фильтр" и "Изменить" -->

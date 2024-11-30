@@ -1,6 +1,7 @@
 package com.example.photoeditor
 
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import com.example.photoeditor.databinding.FragmentFilterPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -73,7 +75,9 @@ class FilterPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            photoEditorView.source.setImageBitmap(it)
+                            bitmap?.let {
+                                photoEditorView.source.setImageBitmap(it)
+                            }
                         }
                     }
 
@@ -94,7 +98,9 @@ class FilterPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            photoEditorView.source.setImageBitmap(it)
+                            bitmap?.let {
+                                photoEditorView.source.setImageBitmap(it)
+                            }
                         }
                     }
 
@@ -113,10 +119,53 @@ class FilterPhotoFragment : Fragment() {
             back()
         }
 
+        // Установка обработчика нажатия для кнопки отката изменения
+        binding.buttonEditBack.setOnClickListener {
+            backBrush()
+        }
+
+        // Установка обработчика нажатия для кнопки отката отката изменения
+        binding.buttonEditForvard.setOnClickListener {
+            editForvard()
+        }
+
         // Установка обработчика нажатия для кнопки сохранения
         binding.buttonSave.setOnClickListener {
             save()
         }
+    }
+
+    // Метод масштабирования изображения
+    private fun scaleBitmapToFitView(bitmap: Bitmap, view: PhotoEditorView) {
+        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val viewWidth = view.width
+                val viewHeight = view.height
+
+                if (viewWidth != 0 && viewHeight != 0) {
+                    val bitmapWidth = bitmap.width
+                    val bitmapHeight = bitmap.height
+
+                    val scaleWidth = viewWidth.toFloat() / bitmapWidth
+                    val scaleHeight = viewHeight.toFloat() / bitmapHeight
+                    val scale = Math.min(scaleWidth, scaleHeight)
+
+                    val matrix = Matrix()
+                    matrix.postScale(scale, scale)
+
+                    // Центрирование изображения
+                    val scaledBitmapWidth = (bitmapWidth * scale).toInt()
+                    val scaledBitmapHeight = (bitmapHeight * scale).toInt()
+                    val translateX = (viewWidth - scaledBitmapWidth) / 2
+                    val translateY = (viewHeight - scaledBitmapHeight) / 2
+                    matrix.postTranslate(translateX.toFloat(), translateY.toFloat())
+
+                    val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true)
+                    photoEditorView.source.setImageBitmap(scaledBitmap)
+                }
+            }
+        })
     }
 
     // Метод возвращения на просмотр фотографии
@@ -131,6 +180,16 @@ class FilterPhotoFragment : Fragment() {
             .addToBackStack(null)
             // Завершение транзакции
             .commit()
+    }
+
+    // Метод отката изменения
+    private fun backBrush() {
+        photoEditor.undo();
+    }
+
+    // Метод отката отката изменения
+    private fun editForvard() {
+        photoEditor.redo();
     }
 
     // Метод сохранения

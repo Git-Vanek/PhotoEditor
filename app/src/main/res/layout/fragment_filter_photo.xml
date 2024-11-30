@@ -54,6 +54,25 @@
                         android:textStyle="bold"/>
 
                     <ImageButton
+                    android:id="@+id/buttonEditBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/editback"
+                    android:src="@drawable/ic_reply"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_marginStart="8dp" />
+
+                    <ImageButton
+                        android:id="@+id/buttonEditForvard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/editforvard"
+                        android:src="@drawable/ic_reply"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_marginStart="8dp"
+                        android:scaleX="-1"/>
+
+                    <ImageButton
                         android:id="@+id/buttonSave"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -76,7 +95,8 @@
                     android:id="@+id/photoEditorView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerInside" />
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true" />
             </LinearLayout>
 
             <!-- Нижняя панель с фильтрами -->

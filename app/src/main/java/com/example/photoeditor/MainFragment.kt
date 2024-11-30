@@ -193,13 +193,6 @@ class MainFragment : Fragment() {
                 LocalDate.parse("2023-11-12")
             ),
             Photo(
-                "5",
-                "5",
-                false,
-                "https://i.pinimg.com/originals/2f/dd/a6/2fdda6a89ec49eea3a9818fa20705785.jpg",
-                LocalDate.parse("2024-11-02")
-            ),
-            Photo(
                 "6",
                 "6",
                 false,

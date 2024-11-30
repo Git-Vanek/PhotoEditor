@@ -2,6 +2,7 @@ package com.example.photoeditor
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -9,14 +10,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
+import android.view.ViewTreeObserver
+import androidx.core.content.ContextCompat
 import com.example.photoeditor.databinding.FragmentDrawPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
-import ja.burhanrashid52.photoeditor.SaveFileResult
-import kotlinx.coroutines.launch
 
 @Suppress("DEPRECATION")
 class DrawPhotoFragment : Fragment() {
@@ -78,7 +78,9 @@ class DrawPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            photoEditorView.source.setImageBitmap(it)
+                            bitmap.let {
+                                scaleBitmapToFitView(it, photoEditorView)
+                            }
                         }
                     }
 
@@ -152,6 +154,43 @@ class DrawPhotoFragment : Fragment() {
         binding.buttonEraser.setOnClickListener {
             eraser()
         }
+
+        // Установка цвета и размера кисти по умолчанию
+        photoEditor.brushColor = Color.RED
+        photoEditor.brushSize = 10f
+    }
+
+    // Метод масштабирования изображения
+    private fun scaleBitmapToFitView(bitmap: Bitmap, view: PhotoEditorView) {
+        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val viewWidth = view.width
+                val viewHeight = view.height
+
+                if (viewWidth != 0 && viewHeight != 0) {
+                    val bitmapWidth = bitmap.width
+                    val bitmapHeight = bitmap.height
+
+                    val scaleWidth = viewWidth.toFloat() / bitmapWidth
+                    val scaleHeight = viewHeight.toFloat() / bitmapHeight
+                    val scale = Math.min(scaleWidth, scaleHeight)
+
+                    val matrix = Matrix()
+                    matrix.postScale(scale, scale)
+
+                    // Центрирование изображения
+                    val scaledBitmapWidth = (bitmapWidth * scale).toInt()
+                    val scaledBitmapHeight = (bitmapHeight * scale).toInt()
+                    val translateX = (viewWidth - scaledBitmapWidth) / 2
+                    val translateY = (viewHeight - scaledBitmapHeight) / 2
+                    matrix.postTranslate(translateX.toFloat(), translateY.toFloat())
+
+                    val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true)
+                    photoEditorView.source.setImageBitmap(scaledBitmap)
+                }
+            }
+        })
     }
 
     // Метод возвращения на просмотр фотографии
@@ -180,22 +219,24 @@ class DrawPhotoFragment : Fragment() {
 
     // Метод сохранения
     private fun save() {
-        lifecycleScope.launch {
-            val result = photoEditor.saveAsFile(filePath)
-            if (result is SaveFileResult.Success) {
-                showSnackbar("Image saved!")
-            } else {
-                showSnackbar("Couldn't save image")
-            }
-        }
+        //lifecycleScope.launch {
+            //val result = photoEditor.saveAsFile(filePath)
+            //if (result is SaveFileResult.Success) {
+                //showSnackbar("Image saved!")
+            //} else {
+                //showSnackbar("Couldn't save image")
+            //}
+        //}
     }
 
     // Метод переключения на кисти
     private fun brush() {
-        // Включите режим рисования
-        photoEditor.setBrushDrawingMode(true)
-        photoEditor.brushColor = Color.RED
-        photoEditor.brushSize = 10f
+        photoEditor.setBrushDrawingMode(!photoEditor.brushDrawableMode!!)
+        if (photoEditor.brushDrawableMode!!) {
+            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.onBackground))
+        } else {
+            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+        }
     }
 
     // Метод переключения цвета
