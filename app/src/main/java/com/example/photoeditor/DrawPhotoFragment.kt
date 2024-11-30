@@ -9,11 +9,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.example.photoeditor.databinding.FragmentDrawPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
+import ja.burhanrashid52.photoeditor.SaveFileResult
+import kotlinx.coroutines.launch
 
 @Suppress("DEPRECATION")
 class DrawPhotoFragment : Fragment() {
@@ -22,6 +25,8 @@ class DrawPhotoFragment : Fragment() {
     // Инициализация переменных для PhotoEditor
     private lateinit var photoEditorView: PhotoEditorView
     private lateinit var photoEditor: PhotoEditor
+    // Переменная фотографии
+    private lateinit var photo: Photo
 
     // Геттер для переменной binding
     private val binding get() = _binding
@@ -56,7 +61,7 @@ class DrawPhotoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Получение аргументов
-        val photo = arguments?.getSerializable(ARG_PHOTO) as Photo
+        photo = arguments?.getSerializable(ARG_PHOTO) as Photo
 
 
         photoEditorView = binding.photoEditorView
@@ -107,9 +112,104 @@ class DrawPhotoFragment : Fragment() {
                     }
                 })
         }
+
+        // Установка обработчика нажатия для кнопки возврата
+        binding.buttonBack.setOnClickListener {
+            back()
+        }
+
+        // Установка обработчика нажатия для кнопки отката изменения
+        binding.buttonEditBack.setOnClickListener {
+            backBrush()
+        }
+
+        // Установка обработчика нажатия для кнопки отката отката изменения
+        binding.buttonEditForvard.setOnClickListener {
+            editForvard()
+        }
+
+        // Установка обработчика нажатия для кнопки сохранения
+        binding.buttonSave.setOnClickListener {
+            save()
+        }
+
+        // Установка обработчика нажатия для кнопки кисти
+        binding.buttonBrush.setOnClickListener {
+            brush()
+        }
+
+        // Установка обработчика нажатия для кнопки цвета
+        binding.buttonColor.setOnClickListener {
+            color()
+        }
+
+        // Установка обработчика нажатия для кнопки размера
+        binding.buttonSize.setOnClickListener {
+            size()
+        }
+
+        // Установка обработчика нажатия для кнопки ластика
+        binding.buttonEraser.setOnClickListener {
+            eraser()
+        }
+    }
+
+    // Метод возвращения на просмотр фотографии
+    private fun back() {
+        // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
+        val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
+        // Начало транзакции фрагмента
+        parentFragmentManager.beginTransaction()
+            // Замена текущего фрагмента на ViewPhotoFragment
+            .replace(R.id.imageContent, viewPhotoFragment)
+            // Добавление транзакции в стек обратного вызова
+            .addToBackStack(null)
+            // Завершение транзакции
+            .commit()
+    }
+
+    // Метод отката изменения
+    private fun backBrush() {
+        photoEditor.undo();
+    }
+
+    // Метод отката отката изменения
+    private fun editForvard() {
+        photoEditor.redo();
+    }
+
+    // Метод сохранения
+    private fun save() {
+        lifecycleScope.launch {
+            val result = photoEditor.saveAsFile(filePath)
+            if (result is SaveFileResult.Success) {
+                showSnackbar("Image saved!")
+            } else {
+                showSnackbar("Couldn't save image")
+            }
+        }
+    }
+
+    // Метод переключения на кисти
+    private fun brush() {
         // Включите режим рисования
         photoEditor.setBrushDrawingMode(true)
         photoEditor.brushColor = Color.RED
         photoEditor.brushSize = 10f
+    }
+
+    // Метод переключения цвета
+    private fun color() {
+
+    }
+
+    // Метод изменения размера
+    private fun size() {
+
+    }
+
+    // Метод переключения на ластик
+    private fun eraser() {
+
     }
 }

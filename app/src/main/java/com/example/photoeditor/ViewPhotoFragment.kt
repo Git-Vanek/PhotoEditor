@@ -1,5 +1,6 @@
 package com.example.photoeditor
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -64,6 +65,11 @@ class ViewPhotoFragment : Fragment() {
                 .into(binding.photoView)
         }
 
+        // Установка обработчика нажатия для кнопки возврата
+        binding.buttonBack.setOnClickListener {
+            back()
+        }
+
         // Установка обработчика нажатия для кнопки рисования
         binding.buttonDraw.setOnClickListener {
             draw()
@@ -78,6 +84,11 @@ class ViewPhotoFragment : Fragment() {
         binding.buttonEdit.setOnClickListener {
             edit()
         }
+    }
+
+    private fun back() {
+        val intent = Intent(context, MainActivity::class.java)
+        startActivity(intent)
     }
 
     // Функция для обработки рисования
