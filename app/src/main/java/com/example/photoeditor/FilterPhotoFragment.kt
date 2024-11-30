@@ -1,30 +1,76 @@
 package com.example.photoeditor
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.photoeditor.databinding.FragmentFilterPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
+import ja.burhanrashid52.photoeditor.PhotoFilter
+import ja.burhanrashid52.photoeditor.SaveSettings
+import java.io.File
+import java.io.IOException
 
 @Suppress("DEPRECATION")
-class FilterPhotoFragment : Fragment() {
+class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentFilterPhotoBinding
     // Инициализация переменных для PhotoEditor
     private lateinit var photoEditorView: PhotoEditorView
     private lateinit var photoEditor: PhotoEditor
+
     // Переменная фотографии
     private lateinit var photo: Photo
+
+    // Ключ для SharedPreferences
+    private val settings: String = "my_settings"
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // Переменные параметров
+    private var imageFormat: String = "jpg"
+
+    // Переменные для работы с фильтрами
+    private lateinit var filterAdapter: FilterAdapter
+    private val mPairList = listOf(
+        Pair(R.drawable.original, PhotoFilter.NONE),
+        Pair(R.drawable.auto_fix, PhotoFilter.AUTO_FIX),
+        Pair(R.drawable.brightness, PhotoFilter.BRIGHTNESS),
+        Pair(R.drawable.contrast, PhotoFilter.CONTRAST),
+        Pair(R.drawable.documentary, PhotoFilter.DOCUMENTARY),
+        Pair(R.drawable.dual_tone, PhotoFilter.DUE_TONE),
+        Pair(R.drawable.fill_light, PhotoFilter.FILL_LIGHT),
+        Pair(R.drawable.fish_eye, PhotoFilter.FISH_EYE),
+        Pair(R.drawable.grain, PhotoFilter.GRAIN),
+        Pair(R.drawable.gray_scale, PhotoFilter.GRAY_SCALE),
+        Pair(R.drawable.lomish, PhotoFilter.LOMISH),
+        Pair(R.drawable.negative, PhotoFilter.NEGATIVE),
+        Pair(R.drawable.posterize, PhotoFilter.POSTERIZE),
+        Pair(R.drawable.saturate, PhotoFilter.SATURATE),
+        Pair(R.drawable.sepia, PhotoFilter.SEPIA),
+        Pair(R.drawable.sharpen, PhotoFilter.SHARPEN),
+        Pair(R.drawable.temprature, PhotoFilter.TEMPERATURE),
+        Pair(R.drawable.tint, PhotoFilter.TINT),
+        Pair(R.drawable.vignette, PhotoFilter.VIGNETTE),
+        Pair(R.drawable.cross_process, PhotoFilter.CROSS_PROCESS),
+        Pair(R.drawable.b_n_w, PhotoFilter.BLACK_WHITE),
+        Pair(R.drawable.flip_horizental, PhotoFilter.FLIP_HORIZONTAL),
+        Pair(R.drawable.flip_vertical, PhotoFilter.FLIP_VERTICAL),
+        Pair(R.drawable.rotate, PhotoFilter.ROTATE)
+    )
 
     // Геттер для переменной binding
     private val binding get() = _binding
@@ -59,7 +105,12 @@ class FilterPhotoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Получение аргументов
-        val photo = arguments?.getSerializable(ARG_PHOTO) as Photo
+        photo = arguments?.getSerializable(ARG_PHOTO) as Photo
+
+        // Инициализация SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
+        // Получение параметров
+        imageFormat = sharedPreferences.getString("image_format", "jpg").toString()
 
         photoEditorView = binding.photoEditorView
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
@@ -75,9 +126,7 @@ class FilterPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            bitmap?.let {
-                                photoEditorView.source.setImageBitmap(it)
-                            }
+                            scaleBitmapToFitView(it, photoEditorView)
                         }
                     }
 
@@ -98,9 +147,7 @@ class FilterPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            bitmap?.let {
-                                photoEditorView.source.setImageBitmap(it)
-                            }
+                            scaleBitmapToFitView(it, photoEditorView)
                         }
                     }
 
@@ -113,6 +160,11 @@ class FilterPhotoFragment : Fragment() {
                     }
                 })
         }
+
+        val rv = binding.recyclerView
+        filterAdapter = FilterAdapter(mPairList, this)
+        rv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        rv.adapter = filterAdapter
 
         // Установка обработчика нажатия для кнопки возврата
         binding.buttonBack.setOnClickListener {
@@ -133,6 +185,10 @@ class FilterPhotoFragment : Fragment() {
         binding.buttonSave.setOnClickListener {
             save()
         }
+    }
+
+    override fun onFilterSelected(filter: PhotoFilter) {
+        photoEditor.setFilterEffect(filter)
     }
 
     // Метод масштабирования изображения
@@ -194,6 +250,34 @@ class FilterPhotoFragment : Fragment() {
 
     // Метод сохранения
     private fun save() {
+        val saveSettings = SaveSettings.Builder()
+            .setClearViewsEnabled(true)
+            .setTransparencyEnabled(true)
+            .build()
 
+        photoEditor.saveAsFile(
+            createImageFile().absolutePath,
+            saveSettings,
+            object : PhotoEditor.OnSaveListener {
+                override fun onSuccess(imagePath: String) {
+                    Toast.makeText(requireContext(), getString(R.string.image_saved), Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(exception: Exception) {
+                    Toast.makeText(requireContext(), getString(R.string.error_saving_image), Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
+    }
+
+    // Метод для создания файла изображения
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "img_${System.currentTimeMillis()}_", /* prefix */
+            "." + imageFormat, /* suffix */
+            storageDir /* directory */
+        )
     }
 }

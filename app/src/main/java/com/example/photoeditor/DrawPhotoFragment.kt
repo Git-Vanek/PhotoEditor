@@ -25,7 +25,6 @@ import android.widget.SeekBar
 import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 @Suppress("DEPRECATION")
@@ -126,7 +125,7 @@ class DrawPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            photoEditorView.source.setImageBitmap(it)
+                            scaleBitmapToFitView(it, photoEditorView)
                         }
                     }
 
@@ -264,6 +263,17 @@ class DrawPhotoFragment : Fragment() {
         )
     }
 
+    // Метод для создания файла изображения
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "img_${System.currentTimeMillis()}_", /* prefix */
+            "." + imageFormat, /* suffix */
+            storageDir /* directory */
+        )
+    }
+
     // Метод переключения на кисти
     private fun brush() {
         if (flagEraser) {
@@ -328,16 +338,5 @@ class DrawPhotoFragment : Fragment() {
         } else {
             binding.buttonEraser.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
         }
-    }
-
-    // Метод для создания файла изображения
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "img_${System.currentTimeMillis()}_", /* prefix */
-            "." + imageFormat, /* suffix */
-            storageDir /* directory */
-        )
     }
 }

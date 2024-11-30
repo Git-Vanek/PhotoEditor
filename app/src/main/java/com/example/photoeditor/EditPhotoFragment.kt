@@ -1,21 +1,28 @@
 package com.example.photoeditor
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.photoeditor.databinding.FragmentEditPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
+import ja.burhanrashid52.photoeditor.SaveSettings
+import java.io.File
+import java.io.IOException
 
 @Suppress("DEPRECATION")
 class EditPhotoFragment : Fragment() {
@@ -24,8 +31,16 @@ class EditPhotoFragment : Fragment() {
     // Инициализация переменных для PhotoEditor
     private lateinit var photoEditorView: PhotoEditorView
     private lateinit var photoEditor: PhotoEditor
+
     // Переменная фотографии
     private lateinit var photo: Photo
+
+    // Ключ для SharedPreferences
+    private val settings: String = "my_settings"
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // Переменные параметров
+    private var imageFormat: String = "jpg"
 
     // Геттер для переменной binding
     private val binding get() = _binding
@@ -62,6 +77,11 @@ class EditPhotoFragment : Fragment() {
         // Получение аргументов
         photo = arguments?.getSerializable(ARG_PHOTO) as Photo
 
+        // Инициализация SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
+        // Получение параметров
+        imageFormat = sharedPreferences.getString("image_format", "jpg").toString()
+
         photoEditorView = binding.photoEditorView
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
             .setPinchTextScalable(true)
@@ -77,7 +97,7 @@ class EditPhotoFragment : Fragment() {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
                             bitmap?.let {
-                                photoEditorView.source.setImageBitmap(it)
+                                scaleBitmapToFitView(it, photoEditorView)
                             }
                         }
                     }
@@ -100,7 +120,7 @@ class EditPhotoFragment : Fragment() {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
                             bitmap?.let {
-                                photoEditorView.source.setImageBitmap(it)
+                                scaleBitmapToFitView(it, photoEditorView)
                             }
                         }
                     }
@@ -200,7 +220,35 @@ class EditPhotoFragment : Fragment() {
 
     // Метод сохранения
     private fun save() {
+        val saveSettings = SaveSettings.Builder()
+            .setClearViewsEnabled(true)
+            .setTransparencyEnabled(true)
+            .build()
 
+        photoEditor.saveAsFile(
+            createImageFile().absolutePath,
+            saveSettings,
+            object : PhotoEditor.OnSaveListener {
+                override fun onSuccess(imagePath: String) {
+                    Toast.makeText(requireContext(), getString(R.string.image_saved), Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(exception: Exception) {
+                    Toast.makeText(requireContext(), getString(R.string.error_saving_image), Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
+    }
+
+    // Метод для создания файла изображения
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "img_${System.currentTimeMillis()}_", /* prefix */
+            "." + imageFormat, /* suffix */
+            storageDir /* directory */
+        )
     }
 
     // Метод обрезания
