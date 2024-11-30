@@ -133,7 +133,7 @@ class PagePhotoFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.func_not_available),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -164,7 +164,7 @@ class PagePhotoFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.func_not_available),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -281,7 +281,7 @@ class PagePhotoFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.func_not_available),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -292,7 +292,7 @@ class PagePhotoFragment : Fragment() {
         val target = object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 if (bitmap != null) {
-                    val fileName = "image_${System.currentTimeMillis()}." + imageFormat
+                    val fileName = "img_${System.currentTimeMillis()}." + imageFormat
                     val file = File(fragment.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
                     try {
                         val outputStream = FileOutputStream(file)
@@ -301,7 +301,7 @@ class PagePhotoFragment : Fragment() {
                         outputStream.close()
                         Toast.makeText(
                             fragment,
-                            getString(R.string.image_saved) + {file.absolutePath},
+                            getString(R.string.image_saved) + ": " + {file.absolutePath},
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: IOException) {
@@ -358,7 +358,7 @@ class PagePhotoFragment : Fragment() {
             Toast.makeText(
                 requireContext(),
                 getString(R.string.func_not_available),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_SHORT
             ).show()
         }
     }

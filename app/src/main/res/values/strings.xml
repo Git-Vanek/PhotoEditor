@@ -45,7 +45,7 @@
     <string name="no_photos_selected">No photos selected</string>
     <string name="error_loading_image">Error loading image</string>
     <string name="error_saving_image">Error saving image</string>
-    <string name="image_saved">"Image saved: "</string>
+    <string name="image_saved">"Image saved"</string>
     <string name="the_photo_is_already_on_your_device">The photo is already on your device</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
@@ -57,6 +57,8 @@
     <string name="all">All</string>
     <string name="my">My</string>
     <string name="general">General</string>
+    <string name="choose_color">Choose Color</string>
+    <string name="choose_brush_size">Choose brush size</string>
     <string-array name="image_format">
         <item>png</item>
         <item>jpg</item>
@@ -74,5 +76,13 @@
     <string-array name="show_dates">
         <item>Yes</item>
         <item>No</item>
+    </string-array>
+    <string-array name="colors">
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Black</item>
+        <item>White</item>
     </string-array>
 </resources>

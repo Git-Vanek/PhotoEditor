@@ -1,11 +1,14 @@
 package com.example.photoeditor
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +20,13 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
+import ja.burhanrashid52.photoeditor.SaveSettings
+import android.widget.SeekBar
+import android.widget.Toast
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @Suppress("DEPRECATION")
 class DrawPhotoFragment : Fragment() {
@@ -25,8 +35,20 @@ class DrawPhotoFragment : Fragment() {
     // Инициализация переменных для PhotoEditor
     private lateinit var photoEditorView: PhotoEditorView
     private lateinit var photoEditor: PhotoEditor
+
     // Переменная фотографии
     private lateinit var photo: Photo
+
+    // Флаги для кнопок
+    private var flagBrush: Boolean = false
+    private var flagEraser: Boolean = false
+
+    // Ключ для SharedPreferences
+    private val settings: String = "my_settings"
+    private lateinit var sharedPreferences: SharedPreferences
+
+    // Переменные параметров
+    private var imageFormat: String = "jpg"
 
     // Геттер для переменной binding
     private val binding get() = _binding
@@ -34,6 +56,7 @@ class DrawPhotoFragment : Fragment() {
     companion object {
         private const val ARG_PHOTO = "photo"
 
+        // Метод для создания нового экземпляра фрагмента
         fun newInstance(photo: Photo): DrawPhotoFragment {
             val fragment = DrawPhotoFragment()
             val args = Bundle()
@@ -63,6 +86,10 @@ class DrawPhotoFragment : Fragment() {
         // Получение аргументов
         photo = arguments?.getSerializable(ARG_PHOTO) as Photo
 
+        // Инициализация SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
+        // Получение параметров
+        imageFormat = sharedPreferences.getString("image_format", "jpg").toString()
 
         photoEditorView = binding.photoEditorView
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
@@ -78,9 +105,7 @@ class DrawPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            bitmap.let {
-                                scaleBitmapToFitView(it, photoEditorView)
-                            }
+                            scaleBitmapToFitView(it, photoEditorView)
                         }
                     }
 
@@ -209,48 +234,110 @@ class DrawPhotoFragment : Fragment() {
 
     // Метод отката изменения
     private fun backBrush() {
-        photoEditor.undo();
+        photoEditor.undo()
     }
 
     // Метод отката отката изменения
     private fun editForvard() {
-        photoEditor.redo();
+        photoEditor.redo()
     }
 
     // Метод сохранения
     private fun save() {
-        //lifecycleScope.launch {
-            //val result = photoEditor.saveAsFile(filePath)
-            //if (result is SaveFileResult.Success) {
-                //showSnackbar("Image saved!")
-            //} else {
-                //showSnackbar("Couldn't save image")
-            //}
-        //}
+        val saveSettings = SaveSettings.Builder()
+            .setClearViewsEnabled(true)
+            .setTransparencyEnabled(true)
+            .build()
+
+        photoEditor.saveAsFile(
+            createImageFile().absolutePath,
+            saveSettings,
+            object : PhotoEditor.OnSaveListener {
+                override fun onSuccess(imagePath: String) {
+                    Toast.makeText(requireContext(), getString(R.string.image_saved), Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(exception: Exception) {
+                    Toast.makeText(requireContext(), getString(R.string.error_saving_image), Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
     }
 
     // Метод переключения на кисти
     private fun brush() {
-        photoEditor.setBrushDrawingMode(!photoEditor.brushDrawableMode!!)
-        if (photoEditor.brushDrawableMode!!) {
-            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.onBackground))
-        } else {
-            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+        if (flagEraser) {
+            eraser() // Выключить режим ластика, если он включен
         }
+        flagBrush = !flagBrush
+        photoEditor.setBrushDrawingMode(flagBrush)
+        updateBrushButtonBackground()
     }
 
     // Метод переключения цвета
     private fun color() {
+        val colors = resources.getStringArray(R.array.colors)
+        val colorCodes = intArrayOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.BLACK, Color.WHITE)
 
+        MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
+            .setTitle(getString(R.string.choose_color))
+            .setItems(colors) { dialog, which ->
+                photoEditor.brushColor = colorCodes[which]
+            }
+            .show()
     }
 
     // Метод изменения размера
     private fun size() {
+        val seekBar = SeekBar(requireContext())
+        seekBar.max = 200
+        seekBar.progress = (photoEditor.brushSize * 10).toInt()
 
+        MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
+            .setTitle(getString(R.string.choose_brush_size))
+            .setView(seekBar)
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+                photoEditor.brushSize = (seekBar.progress / 10f)
+            }
+            .show()
     }
 
     // Метод переключения на ластик
     private fun eraser() {
+        if (flagBrush) {
+            brush() // Выключить режим кисти, если он включен
+        }
+        flagEraser = !flagEraser
+        photoEditor.brushEraser()
+        updateEraserButtonBackground()
+    }
 
+    // Метод обновления фона кнопки кисти
+    private fun updateBrushButtonBackground() {
+        if (flagBrush) {
+            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.onBackground))
+        } else {
+            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
+        }
+    }
+
+    // Метод обновления фона кнопки ластика
+    private fun updateEraserButtonBackground() {
+        if (flagEraser) {
+            binding.buttonEraser.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.onBackground))
+        } else {
+            binding.buttonEraser.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
+        }
+    }
+
+    // Метод для создания файла изображения
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "img_${System.currentTimeMillis()}_", /* prefix */
+            "." + imageFormat, /* suffix */
+            storageDir /* directory */
+        )
     }
 }
