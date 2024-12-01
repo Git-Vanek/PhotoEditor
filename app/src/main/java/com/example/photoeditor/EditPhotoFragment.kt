@@ -142,16 +142,6 @@ class EditPhotoFragment : Fragment() {
             back()
         }
 
-        // Установка обработчика нажатия для кнопки отката изменения
-        binding.buttonEditBack.setOnClickListener {
-            backBrush()
-        }
-
-        // Установка обработчика нажатия для кнопки отката отката изменения
-        binding.buttonEditForvard.setOnClickListener {
-            editForvard()
-        }
-
         // Установка обработчика нажатия для кнопки сохранения
         binding.buttonSave.setOnClickListener {
             save()
@@ -208,16 +198,6 @@ class EditPhotoFragment : Fragment() {
                 }
             }
         })
-    }
-
-    // Метод отката изменения
-    private fun backBrush() {
-        photoEditor.undo()
-    }
-
-    // Метод отката отката изменения
-    private fun editForvard() {
-        photoEditor.redo()
     }
 
     // Метод сохранения
