@@ -59,6 +59,7 @@
     <string name="general">General</string>
     <string name="choose_color">Choose Color</string>
     <string name="choose_brush_size">Choose brush size</string>
+    <string name="text">Text</string>
     <string-array name="image_format">
         <item>png</item>
         <item>jpg</item>

@@ -1,6 +1,8 @@
 package com.example.photoeditor
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -8,13 +10,14 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
+import androidx.core.graphics.drawable.toBitmap
 import com.example.photoeditor.databinding.FragmentEditPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -23,6 +26,9 @@ import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.SaveSettings
 import java.io.File
 import java.io.IOException
+import com.canhub.cropper.CropImage
+import com.canhub.cropper.CropImageView
+import java.io.ByteArrayOutputStream
 
 @Suppress("DEPRECATION")
 class EditPhotoFragment : Fragment() {
@@ -96,9 +102,7 @@ class EditPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            bitmap?.let {
-                                scaleBitmapToFitView(it, photoEditorView)
-                            }
+                            scaleBitmapToFitView(it, photoEditorView)
                         }
                     }
 
@@ -119,9 +123,7 @@ class EditPhotoFragment : Fragment() {
                 .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                         bitmap?.let {
-                            bitmap?.let {
-                                scaleBitmapToFitView(it, photoEditorView)
-                            }
+                            scaleBitmapToFitView(it, photoEditorView)
                         }
                     }
 
@@ -155,7 +157,7 @@ class EditPhotoFragment : Fragment() {
             save()
         }
 
-        // Установка обработчика нажатия для кнопки сохранения
+        // Установка обработчика нажатия для кнопки обрезания
         binding.buttonCrop.setOnClickListener {
             crop()
         }
@@ -210,12 +212,12 @@ class EditPhotoFragment : Fragment() {
 
     // Метод отката изменения
     private fun backBrush() {
-        photoEditor.undo();
+        photoEditor.undo()
     }
 
     // Метод отката отката изменения
     private fun editForvard() {
-        photoEditor.redo();
+        photoEditor.redo()
     }
 
     // Метод сохранения
@@ -230,11 +232,19 @@ class EditPhotoFragment : Fragment() {
             saveSettings,
             object : PhotoEditor.OnSaveListener {
                 override fun onSuccess(imagePath: String) {
-                    Toast.makeText(requireContext(), getString(R.string.image_saved), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.image_saved),
+                        Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 override fun onFailure(exception: Exception) {
-                    Toast.makeText(requireContext(), getString(R.string.error_saving_image), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_saving_image),
+                        Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         )
@@ -253,6 +263,39 @@ class EditPhotoFragment : Fragment() {
 
     // Метод обрезания
     private fun crop() {
+        val bitmap = photoEditorView.source.drawable.toBitmap()
+        val uri = getImageUri(bitmap)
+        CropImage.activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(1, 1)
+            .start(requireContext(), this)
+    }
 
+    private fun getImageUri(bitmap: Bitmap): Uri {
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
+        return Uri.parse(path)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+            if (resultCode == Activity.RESULT_OK) {
+                val resultUri = result?.uriContent
+                val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, resultUri)
+                photoEditorView.source.setImageBitmap(bitmap)
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                val error = result?.error
+                // Handle error
+                Toast.makeText(
+                    requireContext(),
+                    error.toString(),
+                    Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
     }
 }
