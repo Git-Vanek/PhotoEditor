@@ -10,7 +10,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.photoeditor.databinding.FragmentSighinBinding
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
@@ -64,10 +69,15 @@ class SighinFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Создание аунтификатора
         auth = Firebase.auth
+
         // Получение аргументов
         email = arguments?.getSerializable(ARG_EMAIL).toString()
         password = arguments?.getSerializable(ARG_PASSWORD).toString()
+        // Установка значений
+        binding.editEmail.setText(email)
+        binding.editPassword.setText(password)
 
         // Установка обработчика нажатия для кнопки авторизации
         binding.buttonSignIn.setOnClickListener {
@@ -90,6 +100,7 @@ class SighinFragment : Fragment() {
         // Обновление значений
         email = binding.editEmail.text.toString()
         password = binding.editPassword.text.toString()
+
         // Проверка заполнения
         if (email != "" && password != "") {
             auth.signInWithEmailAndPassword(email, password)
@@ -100,9 +111,17 @@ class SighinFragment : Fragment() {
                         goMain(user)
                     } else {
                         Log.w(FIREDASE_LOG_TAG, "signInWithEmail:failure", task.exception)
+                        val errorMessage = when (task.exception) {
+                            is FirebaseAuthWeakPasswordException -> getString(R.string.error_weak_password)
+                            is FirebaseAuthInvalidCredentialsException -> getString(R.string.error_credential)
+                            is FirebaseAuthUserCollisionException -> getString(R.string.error_email_already_in_use)
+                            is FirebaseNetworkException -> getString(R.string.error_network_request_failed)
+                            is FirebaseAuthInvalidUserException -> getString(R.string.error_user_not_found)
+                            else -> getString(R.string.error_unknown)
+                        }
                         Toast.makeText(
                             requireContext(),
-                            getString(R.string.authentication_failed),
+                            errorMessage,
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
@@ -122,6 +141,7 @@ class SighinFragment : Fragment() {
         // Получение значений
         email = binding.editEmail.text.toString()
         password = binding.editPassword.text.toString()
+
         // Создание экземпляра фрагмента SignupFragment с передачей переменной photo
         val signupFragment = SignupFragment.newInstance(email, password)
         // Начало транзакции фрагмента

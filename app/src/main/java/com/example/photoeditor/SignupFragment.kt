@@ -12,11 +12,16 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.photoeditor.databinding.FragmentSignupBinding
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class SignupFragment : Fragment() {
     // Инициализация переменной для View Binding
@@ -40,8 +45,8 @@ class SignupFragment : Fragment() {
         private const val ARG_EMAIL = "name"
         private const val ARG_PASSWORD = "password"
 
-        fun newInstance(email: String, password: String): SighinFragment {
-            val fragment = SighinFragment()
+        fun newInstance(email: String, password: String): SignupFragment {
+            val fragment = SignupFragment()
             val args = Bundle()
             args.putSerializable(ARG_EMAIL, email)
             args.putSerializable(ARG_PASSWORD, password)
@@ -69,10 +74,15 @@ class SignupFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Создание аунтификатора
         auth = Firebase.auth
+
         // Получение аргументов
         email = arguments?.getSerializable(ARG_EMAIL).toString()
         password = arguments?.getSerializable(ARG_PASSWORD).toString()
+        // Установка значений
+        binding.editEmail.setText(email)
+        binding.editPassword.setText(password)
 
         // Установка обработчика нажатия для кнопки регистрации
         binding.buttonSignUp.setOnClickListener {
@@ -92,6 +102,7 @@ class SignupFragment : Fragment() {
         username = binding.editUsername.text.toString()
         email = binding.editEmail.text.toString()
         password = binding.editPassword.text.toString()
+
         // Проверка заполнения
         if (username != "" && email != "" && password != "") {
             auth.createUserWithEmailAndPassword(email, password)
@@ -102,7 +113,7 @@ class SignupFragment : Fragment() {
                             "username" to username,
                             "email" to email,
                             "password" to password,
-                            "created_at " to LocalDate.now()
+                            "created_at" to LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                         )
                         db.collection("Users")
                             .add(user)
@@ -116,9 +127,16 @@ class SignupFragment : Fragment() {
                             }
                     } else {
                         Log.w(FIREDASE_LOG_TAG, "createUserWithEmail:failure", task.exception)
+                        val errorMessage = when (task.exception) {
+                            is FirebaseAuthWeakPasswordException -> getString(R.string.error_weak_password)
+                            is FirebaseAuthInvalidCredentialsException -> getString(R.string.error_invalid_email)
+                            is FirebaseAuthUserCollisionException -> getString(R.string.error_email_already_in_use)
+                            is FirebaseNetworkException -> getString(R.string.error_network_request_failed)
+                            else -> getString(R.string.error_unknown)
+                        }
                         Toast.makeText(
                             requireContext(),
-                            getString(R.string.authentication_failed),
+                            errorMessage,
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
@@ -138,6 +156,7 @@ class SignupFragment : Fragment() {
         // Получение значений
         email = binding.editEmail.text.toString()
         password = binding.editPassword.text.toString()
+
         // Создание экземпляра фрагмента SighinFragment с передачей переменной photo
         val sighinFragment = SighinFragment.newInstance(email, password)
         // Начало транзакции фрагмента
