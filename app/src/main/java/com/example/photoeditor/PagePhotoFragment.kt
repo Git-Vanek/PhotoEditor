@@ -232,7 +232,7 @@ class PagePhotoFragment : Fragment() {
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "img_${System.currentTimeMillis()}_", /* prefix */
-            "." + imageFormat, /* suffix */
+            ".$imageFormat", /* suffix */
             storageDir /* directory */
         ).apply {
             // Сохраняем путь к файлу для последующего использования

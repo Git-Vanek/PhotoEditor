@@ -17,7 +17,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import java.time.LocalDate
@@ -30,16 +29,14 @@ class SignupFragment : Fragment() {
     private val binding get() = _binding
 
     // Переменные firebase
-    val db = Firebase.firestore
+    private val db = Firebase.firestore
     private lateinit var auth: FirebaseAuth
+    private val firebaseLogTag: String = "Firebase_Logs"
 
     // Переменные авторизации
-    lateinit var username: String
-    lateinit var email: String
-    lateinit var password: String
-
-    // Тег для догирования
-    val FIREDASE_LOG_TAG: String = "Firebase_Logs"
+    private lateinit var username: String
+    private lateinit var email: String
+    private lateinit var password: String
 
     companion object {
         private const val ARG_EMAIL = "name"
@@ -108,7 +105,7 @@ class SignupFragment : Fragment() {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
-                        Log.d(FIREDASE_LOG_TAG, "createUserWithEmail:success")
+                        Log.d(firebaseLogTag, "createUserWithEmail:success")
                         val user = hashMapOf(
                             "username" to username,
                             "email" to email,
@@ -118,15 +115,14 @@ class SignupFragment : Fragment() {
                         db.collection("Users")
                             .add(user)
                             .addOnSuccessListener { documentReference ->
-                                Log.d(FIREDASE_LOG_TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                                val cuser = auth.currentUser
-                                goMain(cuser)
+                                Log.d(firebaseLogTag, "DocumentSnapshot added with ID: ${documentReference.id}")
+                                goMain()
                             }
                             .addOnFailureListener { e ->
-                                Log.w(FIREDASE_LOG_TAG, "Error adding document", e)
+                                Log.w(firebaseLogTag, "Error adding document", e)
                             }
                     } else {
-                        Log.w(FIREDASE_LOG_TAG, "createUserWithEmail:failure", task.exception)
+                        Log.w(firebaseLogTag, "createUserWithEmail:failure", task.exception)
                         val errorMessage = when (task.exception) {
                             is FirebaseAuthWeakPasswordException -> getString(R.string.error_weak_password)
                             is FirebaseAuthInvalidCredentialsException -> getString(R.string.error_invalid_email)
@@ -170,7 +166,7 @@ class SignupFragment : Fragment() {
     }
 
     // Переход на главную активность
-    private fun goMain(user: FirebaseUser?) {
+    private fun goMain() {
         // Создание Intent для перехода на MainActivity
         val intent = Intent(activity, MainActivity::class.java)
         // Запуск MainActivity

@@ -1,5 +1,6 @@
 package com.example.photoeditor
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,13 +13,23 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.photoeditor.databinding.FragmentMainBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import java.time.LocalDate
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class MainFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentMainBinding
     // Геттер для переменной binding
     private val binding get() = _binding
+
+    // Переменные firebase
+    private val db = Firebase.firestore
+    private lateinit var auth: FirebaseAuth
+    private var user: FirebaseUser? = null
+    private val firebaseLogTag: String = "Firebase_Logs"
 
     // Список фотографий
     private lateinit var photoList: MutableList<Photo>
@@ -27,6 +38,7 @@ class MainFragment : Fragment() {
     private lateinit var searchView: SearchView
 
     // Переменные для работы с вкладками
+    private lateinit var adapter: PhotoPagerAdapter
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
 
@@ -48,26 +60,10 @@ class MainFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Создаем список фотографий
-        photoList = buildPhotoList()
-        // Создаем адаптер для ViewPager2, передавая ему текущий фрагмент и список фотографий
-        val adapter = PhotoPagerAdapter(this, photoList)
-        // Инициализируем TabLayout из разметки
-        tabLayout = binding.tabLayout
-        // Инициализируем ViewPager2 из разметки
-        viewPager = binding.viewPager
-        // Устанавливаем адаптер для ViewPager2
-        viewPager.adapter = adapter
-        // Создаем TabLayoutMediator для синхронизации TabLayout и ViewPager2
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            // Устанавливаем текст для каждой вкладки в зависимости от позиции
-            tab.text = when (position) {
-                0 -> getString(R.string.general) // Текст для первой вкладки
-                1 -> getString(R.string.my) // Текст для второй вкладки
-                2 -> getString(R.string.all) // Текст для третьей вкладки
-                else -> "" // Текст для других позиций (если есть)
-            }
-        }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
+        // Получение пользователя
+        user = Firebase.auth.currentUser
+        // Создание вкладок
+        createTabs()
 
         // Настройка SearchView
         searchView = binding.searchView
@@ -116,12 +112,15 @@ class MainFragment : Fragment() {
         binding.buttonAdd.setOnClickListener {
             if (adapter.pageTotalPhotoFragment.isVisible) {
                 adapter.pageTotalPhotoFragment.add()
+                createTabs()
             }
             if (adapter.pageMyPhotoFragment.isVisible) {
                 adapter.pageMyPhotoFragment.add()
+                createTabs()
             }
             if (adapter.pageAllPhotoFragment.isVisible) {
                 adapter.pageAllPhotoFragment.add()
+                createTabs()
             }
         }
 
@@ -142,14 +141,45 @@ class MainFragment : Fragment() {
         binding.buttonDelete.setOnClickListener {
             if (adapter.pageTotalPhotoFragment.isVisible) {
                 adapter.pageTotalPhotoFragment.delete()
+                createTabs()
             }
             if (adapter.pageMyPhotoFragment.isVisible) {
                 adapter.pageMyPhotoFragment.delete()
+                createTabs()
             }
             if (adapter.pageAllPhotoFragment.isVisible) {
                 adapter.pageAllPhotoFragment.delete()
+                createTabs()
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createTabs() {
+        // Создаем список фотографий
+        photoList = buildPhotoList()
+        // Создаем адаптер для ViewPager2, передавая ему текущий фрагмент и список фотографий
+        adapter = if (user == null) {
+            PhotoPagerAdapter(this, photoList, false)
+        } else {
+            PhotoPagerAdapter(this, photoList, true)
+        }
+        // Инициализируем TabLayout из разметки
+        tabLayout = binding.tabLayout
+        // Инициализируем ViewPager2 из разметки
+        viewPager = binding.viewPager
+        // Устанавливаем адаптер для ViewPager2
+        viewPager.adapter = adapter
+        // Создаем TabLayoutMediator для синхронизации TabLayout и ViewPager2
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            // Устанавливаем текст для каждой вкладки в зависимости от позиции
+            tab.text = when (position) {
+                0 -> getString(R.string.general) // Текст для первой вкладки
+                1 -> getString(R.string.my) // Текст для второй вкладки
+                2 -> getString(R.string.all) // Текст для третьей вкладки
+                else -> "" // Текст для других позиций (если есть)
+            }
+        }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
     }
 
     // Метод очищения значения из SearchView и сворачиваем его
@@ -164,54 +194,28 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun buildPhotoList(): MutableList<Photo> {
         return mutableListOf(
-            Photo(
-                "1",
-                "1",
-                true,
-                "content://media/external/images/media/58742",
-                LocalDate.parse("2023-11-11")
-            ),
-            Photo(
-                "2",
-                "2",
-                true,
-                "content://media/external/images/media/58743",
-                LocalDate.parse("2023-12-12")
-            ),
-            Photo(
-                "3",
-                "3",
-                true,
-                "content://media/external/images/media/58744",
-                LocalDate.parse("2023-12-12")
-            ),
-            Photo(
-                "4",
-                "4",
-                false,
-                "https://i.pinimg.com/originals/3a/dd/56/3add569b9c10105fbda36232e6abb706.jpg",
-                LocalDate.parse("2023-11-12")
-            ),
-            Photo(
-                "6",
-                "6",
-                false,
-                "https://i.pinimg.com/originals/5d/e2/42/5de24294bad21ec99931f4c362354f22.jpg",
-                LocalDate.parse("2024-12-03")
-            )
+
         )
     }
 
     // Метод для отображения информации пользователя
     private fun userInfo() {
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на UserInfoFragment
-            .replace(R.id.mainContent, UserInfoFragment())
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        if (user == null) {
+            // Создание Intent для перехода на HelloActivity
+            val intent = Intent(activity, HelloActivity::class.java)
+            // Запуск HelloActivity
+            startActivity(intent)
+        }
+        else {
+            // Начало транзакции фрагмента
+            parentFragmentManager.beginTransaction()
+                // Замена текущего фрагмента на UserInfoFragment
+                .replace(R.id.mainContent, UserInfoFragment())
+                // Добавление транзакции в стек обратного вызова
+                .addToBackStack(null)
+                // Завершение транзакции
+                .commit()
+        }
     }
 
     // Метод для отображения настроек

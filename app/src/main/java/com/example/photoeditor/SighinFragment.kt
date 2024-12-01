@@ -16,9 +16,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
 
 class SighinFragment : Fragment() {
     // Инициализация переменной для View Binding
@@ -27,15 +25,12 @@ class SighinFragment : Fragment() {
     private val binding get() = _binding
 
     // Переменные firebase
-    val db = Firebase.firestore
     private lateinit var auth: FirebaseAuth
+    private val firebaseLogTag: String = "Firebase_Logs"
 
     // Переменные авторизации
-    lateinit var email: String
-    lateinit var password: String
-
-    // Тег для догирования
-    val FIREDASE_LOG_TAG: String = "Firebase_Logs"
+    private lateinit var email: String
+    private lateinit var password: String
 
     companion object {
         private const val ARG_EMAIL = "name"
@@ -106,11 +101,10 @@ class SighinFragment : Fragment() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
-                        Log.d(FIREDASE_LOG_TAG, "signInWithEmail:success")
-                        val user = auth.currentUser
-                        goMain(user)
+                        Log.d(firebaseLogTag, "signInWithEmail:success")
+                        goMain()
                     } else {
-                        Log.w(FIREDASE_LOG_TAG, "signInWithEmail:failure", task.exception)
+                        Log.w(firebaseLogTag, "signInWithEmail:failure", task.exception)
                         val errorMessage = when (task.exception) {
                             is FirebaseAuthWeakPasswordException -> getString(R.string.error_weak_password)
                             is FirebaseAuthInvalidCredentialsException -> getString(R.string.error_credential)
@@ -156,11 +150,15 @@ class SighinFragment : Fragment() {
 
     // Функция для обработки входа гостя
     private fun guest() {
-        goMain(null)
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            auth.signOut()
+        }
+        goMain()
     }
 
     // Переход на главную активность
-    private fun goMain(user: FirebaseUser?) {
+    private fun goMain() {
         // Создание Intent для перехода на MainActivity
         val intent = Intent(activity, MainActivity::class.java)
         // Запуск MainActivity
