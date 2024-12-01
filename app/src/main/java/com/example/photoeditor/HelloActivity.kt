@@ -18,9 +18,8 @@ class HelloActivity : AppCompatActivity() {
         // Установка макета активности
         setContentView(binding.root)
 
-        // Создание экземпляра фрагмента SighinFragment
-        val sighinFragment = SighinFragment()
-
+        // Создание экземпляра фрагмента AutorisationFragment с передачей переменной photo
+        val sighinFragment = SighinFragment.newInstance("", "")
         // Начало транзакции фрагмента
         supportFragmentManager.beginTransaction()
             // Замена текущего фрагмента на SighinFragment

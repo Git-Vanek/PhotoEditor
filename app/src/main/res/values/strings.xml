@@ -60,6 +60,8 @@
     <string name="choose_color">Choose Color</string>
     <string name="choose_brush_size">Choose brush size</string>
     <string name="text">Text</string>
+    <string name="error">Fill all fields</string>
+    <string name="authentication_failed">Authentication failed</string>
     <string-array name="image_format">
         <item>png</item>
         <item>jpg</item>
