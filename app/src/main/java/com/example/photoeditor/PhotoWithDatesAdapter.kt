@@ -14,7 +14,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
-class PhotoWithDatesAdapter(private val photoAdapter: PhotoAdapter, private val gridCount: Int, private val context: Context?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PhotoWithDatesAdapter(photoAdapter: PhotoAdapter, private val gridCount: Int, private val context: Context?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // Список элементов (заголовки дат и фотографии)
     private val items = mutableListOf<Any>()

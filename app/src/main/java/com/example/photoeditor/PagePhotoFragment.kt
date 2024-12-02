@@ -73,7 +73,6 @@ class PagePhotoFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     companion object {
-        private const val REQUEST_CODE_PICK_PHOTO = 1
         private const val ARG_PHOTO_LIST = "photo_list"
 
         fun newInstance(list: MutableList<Photo>): PagePhotoFragment {

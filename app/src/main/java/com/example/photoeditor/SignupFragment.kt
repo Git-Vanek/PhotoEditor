@@ -127,9 +127,16 @@ class SignupFragment : Fragment() {
                         }
                     } else {
                         Log.w(firebaseLogTag, "createUserWithEmail:failure", task.exception)
+                        val errorMessage = when (task.exception) {
+                            is FirebaseAuthWeakPasswordException -> getString(R.string.error_weak_password)
+                            is FirebaseAuthInvalidCredentialsException -> getString(R.string.error_invalid_email)
+                            is FirebaseAuthUserCollisionException -> getString(R.string.error_email_already_in_use)
+                            is FirebaseNetworkException -> getString(R.string.error_network_request_failed)
+                            else -> getString(R.string.error_unknown)
+                        }
                         Toast.makeText(
                             requireContext(),
-                            getString(R.string.authentication_failed),
+                            errorMessage,
                             Toast.LENGTH_SHORT,
                         ).show()
                     }

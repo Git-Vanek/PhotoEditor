@@ -17,6 +17,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.example.photoeditor.databinding.FragmentEditPhotoBinding
 import com.squareup.picasso.Picasso
@@ -28,6 +30,7 @@ import java.io.File
 import java.io.IOException
 import com.canhub.cropper.CropImage
 import com.canhub.cropper.CropImageView
+import com.yalantis.ucrop.UCrop
 import java.io.ByteArrayOutputStream
 
 @Suppress("DEPRECATION")
@@ -245,10 +248,28 @@ class EditPhotoFragment : Fragment() {
     private fun crop() {
         val bitmap = photoEditorView.source.drawable.toBitmap()
         val uri = getImageUri(bitmap)
-        CropImage.activity(uri)
-            .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(1, 1)
+        val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
+        val options = UCrop.Options()
+        options.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.primary))
+        options.setStatusBarColor(ContextCompat.getColor(requireContext(), R.color.primary))
+        options.setToolbarWidgetColor(ContextCompat.getColor(requireContext(), R.color.onPrimary))
+        UCrop.of(uri, destinationUri)
+            .withOptions(options)
+            .withAspectRatio(1f, 1f)
             .start(requireContext(), this)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            val resultUri = UCrop.getOutput(data!!)
+            val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, resultUri!!)
+            photoEditorView.source.setImageBitmap(bitmap)
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            val cropError = UCrop.getError(data!!)
+            Toast.makeText(requireContext(), cropError?.message ?: "Unknown error", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun getImageUri(bitmap: Bitmap): Uri {
@@ -258,24 +279,4 @@ class EditPhotoFragment : Fragment() {
         return Uri.parse(path)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode == Activity.RESULT_OK) {
-                val resultUri = result?.uriContent
-                val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, resultUri)
-                photoEditorView.source.setImageBitmap(bitmap)
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result?.error
-                // Handle error
-                Toast.makeText(
-                    requireContext(),
-                    error.toString(),
-                    Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-    }
 }
