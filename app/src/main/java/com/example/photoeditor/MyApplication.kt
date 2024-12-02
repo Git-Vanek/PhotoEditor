@@ -17,8 +17,7 @@ class MyApplication : Application() {
 
     private fun setAppTheme() {
         sharedPreferences = getSharedPreferences(settings, Context.MODE_PRIVATE)
-        val savedTheme = sharedPreferences.getString("theme", "System")
-        when (savedTheme) {
+        when (sharedPreferences.getString("theme", "System")) {
             "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)

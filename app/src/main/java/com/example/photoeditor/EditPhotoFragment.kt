@@ -17,7 +17,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.example.photoeditor.databinding.FragmentEditPhotoBinding
@@ -28,8 +27,6 @@ import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.SaveSettings
 import java.io.File
 import java.io.IOException
-import com.canhub.cropper.CropImage
-import com.canhub.cropper.CropImageView
 import com.yalantis.ucrop.UCrop
 import java.io.ByteArrayOutputStream
 
@@ -184,7 +181,7 @@ class EditPhotoFragment : Fragment() {
 
                     val scaleWidth = viewWidth.toFloat() / bitmapWidth
                     val scaleHeight = viewHeight.toFloat() / bitmapHeight
-                    val scale = Math.min(scaleWidth, scaleHeight)
+                    val scale = scaleWidth.coerceAtMost(scaleHeight)
 
                     val matrix = Matrix()
                     matrix.postScale(scale, scale)
@@ -239,7 +236,7 @@ class EditPhotoFragment : Fragment() {
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "img_${System.currentTimeMillis()}_", /* prefix */
-            "." + imageFormat, /* suffix */
+            ".$imageFormat", /* suffix */
             storageDir /* directory */
         )
     }

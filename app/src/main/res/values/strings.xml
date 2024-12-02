@@ -16,7 +16,6 @@
     <string name="draw">Draw</string>
     <string name="filter">Filter</string>
     <string name="edit">Edit</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="im_a_guest">Im a guest</string>
     <string name="permission_to_write">Permission to write to the device memory has not been granted</string>
     <string name="settings_saved">Settings saved</string>
@@ -59,15 +58,11 @@
     <string name="general">General</string>
     <string name="choose_color">Choose Color</string>
     <string name="choose_brush_size">Choose brush size</string>
-    <string name="text">Text</string>
     <string name="error">Fill all fields</string>
-    <string name="authentication_failed">Authentication failed</string>
     <string name="error_unknown">Unknown error occurred</string>
     <string name="error_credential">The supplied auth credential is incorrect, malformed or has expired</string>
     <string name="error_invalid_email">Invalid email address</string>
-    <string name="error_user_disabled">User account has been disabled</string>
     <string name="error_user_not_found">No user record found for the given email</string>
-    <string name="error_wrong_password">Wrong password</string>
     <string name="error_email_already_in_use">Email address is already in use by another account</string>
     <string name="error_weak_password">Weak password</string>
     <string name="error_network_request_failed">Network request failed</string>

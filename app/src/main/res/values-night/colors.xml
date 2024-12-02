@@ -2,15 +2,9 @@
 <resources>
     <!-- Основные цвета для темной темы -->
     <color name="primary">#00BFA5</color>
-    <color name="primaryVariant">#009688</color>
     <color name="secondary">#00796B</color>
-    <color name="secondaryVariant">#004D40</color>
     <color name="background">#121212</color>
-    <color name="surface">#1E1E1E</color>
-    <color name="error">#CF6679</color>
     <color name="onPrimary">#000000</color>
     <color name="onSecondary">#000000</color>
     <color name="onBackground">#FFFFFF</color>
-    <color name="onSurface">#FFFFFF</color>
-    <color name="onError">#000000</color>
 </resources>

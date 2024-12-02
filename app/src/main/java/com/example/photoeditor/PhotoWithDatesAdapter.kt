@@ -72,7 +72,7 @@ class PhotoWithDatesAdapter(photoAdapter: PhotoAdapter, private val gridCount: I
         // Привязка данных к TextView и вложенному RecyclerView
         fun bind(date: String, photos: List<Photo>) {
             val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
-            val localDate = LocalDate.parse(date + "-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            val localDate = LocalDate.parse("$date-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             dateTextView.text = localDate.format(formatter)
 
             // Установка адаптера и LayoutManager для вложенного RecyclerView

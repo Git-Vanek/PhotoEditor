@@ -2,15 +2,9 @@
 <resources>
     <!-- Основные цвета -->
     <color name="primary">#00BFA5</color>
-    <color name="primaryVariant">#009688</color>
     <color name="secondary">#00796B</color>
-    <color name="secondaryVariant">#004D40</color>
     <color name="background">#E0F7FA</color>
-    <color name="surface">#B2EBF2</color>
-    <color name="error">#B00020</color>
     <color name="onPrimary">#FFFFFF</color>
     <color name="onSecondary">#FFFFFF</color>
     <color name="onBackground">#000000</color>
-    <color name="onSurface">#000000</color>
-    <color name="onError">#FFFFFF</color>
 </resources>

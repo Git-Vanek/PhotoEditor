@@ -195,7 +195,7 @@ class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
 
                     val scaleWidth = viewWidth.toFloat() / bitmapWidth
                     val scaleHeight = viewHeight.toFloat() / bitmapHeight
-                    val scale = Math.min(scaleWidth, scaleHeight)
+                    val scale = scaleWidth.coerceAtMost(scaleHeight)
 
                     val matrix = Matrix()
                     matrix.postScale(scale, scale)
@@ -256,7 +256,7 @@ class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "img_${System.currentTimeMillis()}_", /* prefix */
-            "." + imageFormat, /* suffix */
+            ".$imageFormat", /* suffix */
             storageDir /* directory */
         )
     }

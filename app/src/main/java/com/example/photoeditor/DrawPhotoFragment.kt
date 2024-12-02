@@ -198,7 +198,7 @@ class DrawPhotoFragment : Fragment() {
 
                     val scaleWidth = viewWidth.toFloat() / bitmapWidth
                     val scaleHeight = viewHeight.toFloat() / bitmapHeight
-                    val scale = Math.min(scaleWidth, scaleHeight)
+                    val scale = scaleWidth.coerceAtMost(scaleHeight)
 
                     val matrix = Matrix()
                     matrix.postScale(scale, scale)
@@ -269,7 +269,7 @@ class DrawPhotoFragment : Fragment() {
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
             "img_${System.currentTimeMillis()}_", /* prefix */
-            "." + imageFormat, /* suffix */
+            ".$imageFormat", /* suffix */
             storageDir /* directory */
         )
     }
@@ -291,7 +291,7 @@ class DrawPhotoFragment : Fragment() {
 
         MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
             .setTitle(getString(R.string.choose_color))
-            .setItems(colors) { dialog, which ->
+            .setItems(colors) { _, which ->
                 photoEditor.brushColor = colorCodes[which]
             }
             .show()
@@ -306,7 +306,7 @@ class DrawPhotoFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext(), R.style.Widget_PhotoEditor_AlertDialog)
             .setTitle(getString(R.string.choose_brush_size))
             .setView(seekBar)
-            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 photoEditor.brushSize = (seekBar.progress / 10f)
             }
             .show()

@@ -27,7 +27,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingEnd="16dp">
+                android:paddingEnd="16dp"
+                android:paddingStart="0dp">
 
                 <!-- Строка поиска -->
                 <androidx.appcompat.widget.SearchView

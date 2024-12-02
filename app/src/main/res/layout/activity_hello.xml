@@ -21,14 +21,12 @@
             android:layout_marginBottom="24dp" >
 
             <ImageView
-                android:id="@+id/imageLogo"
                 android:layout_width="160dp"
                 android:layout_height="160dp"
                 app:srcCompat="@drawable/logo"
                 android:contentDescription="@string/logo" />
 
             <TextView
-                android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

@@ -21,7 +21,6 @@
 
             <!-- Иконка для поля ввода email -->
             <ImageView
-                android:id="@+id/imageView2"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 app:srcCompat="@drawable/ic_email"
@@ -53,7 +52,6 @@
 
             <!-- Иконка для поля ввода пароля -->
             <ImageView
-                android:id="@+id/imageView3"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 app:srcCompat="@drawable/ic_shield"

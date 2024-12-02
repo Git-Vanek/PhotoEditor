@@ -1,10 +1,98 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PhotoEditor</string>
     <string name="signin">Войти</string>
-    <string name="signup">Регистрация</string>
+    <string name="signup">Зарегистрироваться</string>
     <string name="back">Назад</string>
     <string name="password">Пароль</string>
-    <string name="email">Почта</string>
+    <string name="email">Email</string>
     <string name="username">Имя пользователя</string>
+    <string name="add">Добавить</string>
+    <string name="load">Загрузить</string>
+    <string name="delete">Удалить</string>
+    <string name="logout">Выйти</string>
+    <string name="created_at">Создано</string>
+    <string name="image_format">Формат изображения</string>
+    <string name="save">Сохранить</string>
+    <string name="draw">Рисовать</string>
+    <string name="filter">Фильтр</string>
+    <string name="edit">Редактировать</string>
+    <string name="im_a_guest">Я гость</string>
+    <string name="permission_to_write">Разрешение на запись в память устройства не предоставлено</string>
+    <string name="settings_saved">Настройки сохранены</string>
+    <string name="photo_edit">Редактирование фото</string>
+    <string name="editback">РедактироватьНазад</string>
+    <string name="editforvard">РедактироватьВперед</string>
+    <string name="crop">Обрезать</string>
+    <string name="photo_filter">Фильтр фото</string>
+    <string name="photo_draw">Рисование на фото</string>
+    <string name="photo_view">Просмотр фото</string>
+    <string name="user_info">Информация о пользователе</string>
+    <string name="settings">Настройки</string>
+    <string name="brush">Кисть</string>
+    <string name="color">Цвет</string>
+    <string name="size">Размер</string>
+    <string name="eraser">Ластик</string>
+    <string name="theme">Тема</string>
+    <string name="columns">Колонки</string>
+    <string name="show_dates">Показать даты</string>
+    <string name="yes">Да</string>
+    <string name="logo">Логотип</string>
+    <string name="func_not_available">Эта функция недоступна в этом режиме</string>
+    <string name="no">Нет</string>
+    <string name="want_to_delete">Вы уверены, что хотите удалить выбранные фото?</string>
+    <string name="confirm_deletion">Подтвердить удаление</string>
+    <string name="no_photos_selected">Фото не выбраны</string>
+    <string name="error_loading_image">Ошибка загрузки изображения</string>
+    <string name="error_saving_image">Ошибка сохранения изображения</string>
+    <string name="image_saved">Изображение сохранено</string>
+    <string name="the_photo_is_already_on_your_device">Фото уже на вашем устройстве</string>
+    <string name="cancel">Отмена</string>
+    <string name="ok">ОК</string>
+    <string name="enter_photo_url">Введите URL фото</string>
+    <string name="from_internet">Из интернета</string>
+    <string name="from_device">С устройства</string>
+    <string name="choose_photo_source">Выберите источник фото</string>
+    <string name="take_photo">Сделать фото</string>
+    <string name="all">Все</string>
+    <string name="my">Мои</string>
+    <string name="general">Общие</string>
+    <string name="choose_color">Выберите цвет</string>
+    <string name="choose_brush_size">Выберите размер кисти</string>
+    <string name="error">Заполните все поля</string>
+    <string name="error_unknown">Произошла неизвестная ошибка</string>
+    <string name="error_credential">Предоставленные учетные данные неверны, некорректны или истекли</string>
+    <string name="error_invalid_email">Неверный адрес электронной почты</string>
+    <string name="error_user_not_found">Нет записи пользователя для указанного email</string>
+    <string name="error_email_already_in_use">Адрес электронной почты уже используется другим аккаунтом</string>
+    <string name="error_weak_password">Слабый пароль</string>
+    <string name="error_network_request_failed">Ошибка сетевого запроса</string>
+    <string name="loading">Загрузка</string>
+    <string name="filter_image">Фильтр изображения</string>
+    <string name="image">Изображение</string>
+    <string-array name="image_format">
+        <item>png</item>
+        <item>jpg</item>
+    </string-array>
+    <string-array name="themes">
+        <item>Dark</item>
+        <item>Light</item>
+        <item>System</item>
+    </string-array>
+    <string-array name="columns">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="show_dates">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+    <string-array name="colors">
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Black</item>
+        <item>White</item>
+    </string-array>
 </resources>

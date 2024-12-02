@@ -191,9 +191,9 @@ class MainFragment : Fragment() {
         userRef.get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val photoRefs = document.get("photoRefs") as? List<String>
+                    val photoRefs = document.get("photoRefs") as? List<*>
                     photoRefs?.forEach { photoId ->
-                        val photoRef = db.collection("Photos").document(photoId)
+                        val photoRef = db.collection("Photos").document(photoId.toString())
                         photoRef.get()
                             .addOnSuccessListener { photoDocument ->
                                 if (photoDocument != null) {
