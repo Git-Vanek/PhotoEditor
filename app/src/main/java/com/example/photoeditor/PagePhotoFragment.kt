@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,11 +27,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photoeditor.databinding.FragmentPagePhotoBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.firestore
 import com.squareup.picasso.Picasso
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Suppress("DEPRECATION")
 class PagePhotoFragment : Fragment() {
@@ -58,6 +64,14 @@ class PagePhotoFragment : Fragment() {
     // Переменая хранения пути для сделанной фотографии
     private var currentPhotoPath: String? = null
 
+    // Переменные firebase
+    private val db = Firebase.firestore
+    private var user: FirebaseUser? = null
+    private val firebaseLogTag: String = "Firebase_Logs"
+
+    // Текущая дата
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     companion object {
         private const val REQUEST_CODE_PICK_PHOTO = 1
         private const val ARG_PHOTO_LIST = "photo_list"
@@ -125,7 +139,7 @@ class PagePhotoFragment : Fragment() {
     fun filterList(query: String) {
         if (!showDates) {
             val filteredList = photoList.filter { photo ->
-                photo.createdAt.toString().contains(query, ignoreCase = true)
+                photo.createdAt.contains(query, ignoreCase = true)
             }
             photoAdapter.filterList(filteredList.toMutableList())
         }
@@ -145,7 +159,6 @@ class PagePhotoFragment : Fragment() {
         startActivity(intent)
     }
 
-    // Метод для добавления элемента
     @RequiresApi(Build.VERSION_CODES.O)
     fun add() {
         if (!showDates) {
@@ -170,20 +183,19 @@ class PagePhotoFragment : Fragment() {
     }
 
     // Метод получения фотографии с устройства
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun pickPhotoFromDevice() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, REQUEST_CODE_PICK_PHOTO)
+        pickPhotoLauncher.launch(intent)
     }
 
     // Обработка результата выбора фотографии с устройства
-    @Deprecated("Deprecated in Java")
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PICK_PHOTO && resultCode == Activity.RESULT_OK) {
-            val selectedImageUri = data?.data
+    private val pickPhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val selectedImageUri = result.data?.data
             if (selectedImageUri != null) {
-                photoAdapter.addItem(Photo("7", "7", true, selectedImageUri.toString(), LocalDate.now()))
+                addPhoto(Photo(date, true, selectedImageUri.toString(), user != null))
             }
         }
     }
@@ -199,13 +211,14 @@ class PagePhotoFragment : Fragment() {
         builder.setView(input)
         builder.setPositiveButton(getString(R.string.ok)) { _, _ ->
             val url = input.text.toString()
-            photoAdapter.addItem(Photo("8", "8", false, url, LocalDate.now()))
+            addPhoto(Photo(date, false, url, user != null))
         }
         builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
             dialog.cancel()
         }
         builder.show()
     }
+
 
     // Метод для создания фотографии с использованием камеры
     @RequiresApi(Build.VERSION_CODES.O)
@@ -248,7 +261,7 @@ class PagePhotoFragment : Fragment() {
             val photoUri = FileProvider.getUriForFile(requireContext(), "com.example.photoeditor.fileprovider", File(
                 currentPhotoPath.toString()
             ))
-            photoAdapter.addItem(Photo("9", "9", true, photoUri.toString(), LocalDate.now()))
+            addPhoto(Photo(date, true, photoUri.toString(), user != null))
         }
     }
 
@@ -265,7 +278,6 @@ class PagePhotoFragment : Fragment() {
             } else {
                 for (selectedItem in selectedItems) {
                     if (!selectedItem.original) {
-                        // Save the photo to the device
                         saveImageToDevice(selectedItem)
                     } else {
                         Toast.makeText(
@@ -346,8 +358,7 @@ class PagePhotoFragment : Fragment() {
                     .setTitle(getString(R.string.confirm_deletion))
                     .setMessage(getString(R.string.want_to_delete))
                     .setPositiveButton(R.string.yes) { _, _ ->
-                        photoAdapter.filterList(photoAdapter.dataset.filter { it !in selectedItems }
-                            .toMutableList())
+                        removePhotos(photoAdapter.dataset.filter { it !in selectedItems }.toMutableList())
                         photoAdapter.clearSelection()
                     }
                     .setNegativeButton(getString(R.string.no), null)
@@ -360,6 +371,68 @@ class PagePhotoFragment : Fragment() {
                 getString(R.string.func_not_available),
                 Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+
+    // Метод добавления фотографии
+    private fun addPhoto(photo: Photo) {
+        val photoRef = db.collection("Photos").document()
+        val photoData = hashMapOf(
+            "created_at" to photo.createdAt,
+            "original" to photo.original,
+            "path" to photo.path,
+            "private" to photo.private
+        )
+
+        photoRef.set(photoData)
+            .addOnSuccessListener {
+                if (photo.private) {
+                    val userRef = db.collection("Users").document(user!!.uid)
+                    userRef.update("photoRefs", FieldValue.arrayUnion(photoRef.id))
+                        .addOnSuccessListener {
+                            Log.d(firebaseLogTag, "Photo reference added to user document")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(firebaseLogTag, "Error updating user document", e)
+                        }
+                } else {
+                    Log.d(firebaseLogTag, "Photo is public, no reference added to user document")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(firebaseLogTag, "Error adding photo document", e)
+            }
+    }
+
+    // Метод удаления выбранных фотографий
+    private fun removePhotos(photos: MutableList<Photo>) {
+        for (photo in photos) {
+             db.collection("Photos")
+                .whereEqualTo("path", photo.path)
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        val photoId = document.id
+                        val photoRef = db.collection("Photos").document(photoId)
+                        photoRef.delete()
+                            .addOnSuccessListener {
+                                val userRef = db.collection("Users").document(user!!.uid)
+                                userRef.update("photoRefs", FieldValue.arrayRemove(photoId))
+                                    .addOnSuccessListener {
+                                        Log.d(firebaseLogTag, "Photo reference removed from user document")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.w(firebaseLogTag, "Error updating user document", e)
+                                    }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(firebaseLogTag, "Error deleting photo document", e)
+                            }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.w(firebaseLogTag, "Error getting photo documents", e)
+                }
         }
     }
 }

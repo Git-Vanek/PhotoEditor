@@ -148,10 +148,4 @@ class PhotoAdapter(var dataset: MutableList<Photo>, private val context: Context
         dataset = filteredList
         notifyDataSetChanged()
     }
-
-    // Метод для добавления одного элемента
-    fun addItem(newData: Photo) {
-        dataset.add(newData)
-        notifyItemInserted(dataset.size - 1)
-    }
 }

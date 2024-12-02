@@ -71,7 +71,6 @@
     <string name="error_email_already_in_use">Email address is already in use by another account</string>
     <string name="error_weak_password">Weak password</string>
     <string name="error_network_request_failed">Network request failed</string>
-    <string name="error_getting_documents">Error getting documents</string>
     <string name="loading">Loading</string>
     <string-array name="image_format">
         <item>png</item>

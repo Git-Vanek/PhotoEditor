@@ -3,6 +3,7 @@ package com.example.photoeditor
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +15,6 @@ import com.example.photoeditor.databinding.FragmentMainBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
@@ -27,12 +27,12 @@ class MainFragment : Fragment() {
 
     // Переменные firebase
     private val db = Firebase.firestore
-    private lateinit var auth: FirebaseAuth
     private var user: FirebaseUser? = null
     private val firebaseLogTag: String = "Firebase_Logs"
 
-    // Список фотографий
-    private lateinit var photoList: MutableList<Photo>
+    // Списоки фотографий
+    private lateinit var userList: MutableList<Photo>
+    private lateinit var totalList: MutableList<Photo>
 
     // Строка поиска
     private lateinit var searchView: SearchView
@@ -63,7 +63,7 @@ class MainFragment : Fragment() {
         // Получение пользователя
         user = Firebase.auth.currentUser
         // Создание вкладок
-        createTabs()
+        getData()
 
         // Настройка SearchView
         searchView = binding.searchView
@@ -84,20 +84,6 @@ class MainFragment : Fragment() {
             }
         })
 
-        // Регистрируем обратный вызов для отслеживания изменений страницы в ViewPager2
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            // Этот метод вызывается, когда выбранная страница изменяется
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                // В зависимости от позиции выбранной страницы выполняем соответствующие действия
-                when (position) {
-                    0 -> cleanSearchView()
-                    1 -> cleanSearchView()
-                    2 -> cleanSearchView()
-                }
-            }
-        })
-
         // Установка обработчика нажатия для кнопки информация пользователя
         binding.buttonUserInfo.setOnClickListener {
             userInfo()
@@ -112,15 +98,15 @@ class MainFragment : Fragment() {
         binding.buttonAdd.setOnClickListener {
             if (adapter.pageTotalPhotoFragment.isVisible) {
                 adapter.pageTotalPhotoFragment.add()
-                createTabs()
+                getData()
             }
             if (adapter.pageMyPhotoFragment.isVisible) {
                 adapter.pageMyPhotoFragment.add()
-                createTabs()
+                getData()
             }
             if (adapter.pageAllPhotoFragment.isVisible) {
                 adapter.pageAllPhotoFragment.add()
-                createTabs()
+                getData()
             }
         }
 
@@ -141,28 +127,106 @@ class MainFragment : Fragment() {
         binding.buttonDelete.setOnClickListener {
             if (adapter.pageTotalPhotoFragment.isVisible) {
                 adapter.pageTotalPhotoFragment.delete()
-                createTabs()
+                getData()
             }
             if (adapter.pageMyPhotoFragment.isVisible) {
                 adapter.pageMyPhotoFragment.delete()
-                createTabs()
+                getData()
             }
             if (adapter.pageAllPhotoFragment.isVisible) {
                 adapter.pageAllPhotoFragment.delete()
-                createTabs()
+                getData()
             }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    // Метод очищения значения из SearchView и сворачиваем его
+    private fun cleanSearchView() {
+        searchView.post {
+            searchView.isIconified = true
+            searchView.clearFocus()
+        }
+    }
+
+    // Метод обновления списков
+    private fun getData() {
+        getPhotosForTotal()
+    }
+
+    // Метод получения всех общих фотографий
+    private fun getPhotosForTotal() {
+        totalList = mutableListOf()
+        // Чтение данных
+        db.collection("Photos")
+            .whereEqualTo("private", false)
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    Log.d(firebaseLogTag, "Totals - ${document.id} => ${document.data}")
+                    totalList.add(
+                        Photo(
+                            document.getString("created_at").toString(),
+                            document.getBoolean("original") == true,
+                            document.getString("path").toString(),
+                            document.getBoolean("private") == true
+                        )
+                    )
+                }
+                if (user == null) {
+                    createTabs()
+                }
+                else {
+                    getPhotosForUser()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(firebaseLogTag, "Error getting documents", exception)
+            }
+    }
+
+    // Метод получения всех фотографий пользователя
+    private fun getPhotosForUser() {
+        userList = mutableListOf()
+        val userRef = db.collection("Users").document(user!!.uid)
+        userRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val photoRefs = document.get("photoRefs") as? List<String>
+                    photoRefs?.forEach { photoId ->
+                        val photoRef = db.collection("Photos").document(photoId)
+                        photoRef.get()
+                            .addOnSuccessListener { photoDocument ->
+                                if (photoDocument != null) {
+                                    Log.d(firebaseLogTag, "Users - ${photoDocument.id} => ${photoDocument.data}")
+                                    userList.add(
+                                        Photo(
+                                            photoDocument.getString("created_at")!!,
+                                            photoDocument.getBoolean("original")!!,
+                                            photoDocument.getString("path")!!,
+                                            photoDocument.getBoolean("private")!!
+                                        )
+                                    )
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(firebaseLogTag, "Error getting photo document", e)
+                            }
+                    }
+                    createTabs()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(firebaseLogTag, "Error getting user document", e)
+            }
+    }
+
+    // Метод отображения вкладок
     private fun createTabs() {
-        // Создаем список фотографий
-        photoList = buildPhotoList()
         // Создаем адаптер для ViewPager2, передавая ему текущий фрагмент и список фотографий
         adapter = if (user == null) {
-            PhotoPagerAdapter(this, photoList, false)
+            PhotoPagerAdapter(this, mutableListOf(), totalList, false)
         } else {
-            PhotoPagerAdapter(this, photoList, true)
+            PhotoPagerAdapter(this, userList, totalList, true)
         }
         // Инициализируем TabLayout из разметки
         tabLayout = binding.tabLayout
@@ -180,22 +244,20 @@ class MainFragment : Fragment() {
                 else -> "" // Текст для других позиций (если есть)
             }
         }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
-    }
 
-    // Метод очищения значения из SearchView и сворачиваем его
-    private fun cleanSearchView() {
-        searchView.post {
-            searchView.isIconified = true
-            searchView.clearFocus()
-        }
-    }
-
-    // Метод для создания списка фотографий
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun buildPhotoList(): MutableList<Photo> {
-        return mutableListOf(
-
-        )
+        // Регистрируем обратный вызов для отслеживания изменений страницы в ViewPager2
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            // Этот метод вызывается, когда выбранная страница изменяется
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                // В зависимости от позиции выбранной страницы выполняем соответствующие действия
+                when (position) {
+                    0 -> cleanSearchView()
+                    1 -> cleanSearchView()
+                    2 -> cleanSearchView()
+                }
+            }
+        })
     }
 
     // Метод для отображения информации пользователя

@@ -3,32 +3,21 @@ package com.example.photoeditor
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class PhotoPagerAdapter(fragment: Fragment, list: MutableList<Photo>, reg: Boolean) : FragmentStateAdapter(fragment) {
-    private val photoMutableList: MutableList<Photo> = list
+class PhotoPagerAdapter(fragment: Fragment, list1: MutableList<Photo>, list2: MutableList<Photo>, reg: Boolean) : FragmentStateAdapter(fragment) {
+    private val userList: MutableList<Photo> = list1
+    private val totalList: MutableList<Photo> = list2
     private val userReg: Boolean = reg
 
     val pageTotalPhotoFragment: PagePhotoFragment by lazy {
-        val result: MutableList<Photo> = mutableListOf()
-        for (photo in photoMutableList) {
-            if (!photo.original) {
-                result.add(photo)
-            }
-        }
-        PagePhotoFragment.newInstance(result)
+        PagePhotoFragment.newInstance(totalList)
     }
 
     val pageMyPhotoFragment: PagePhotoFragment by lazy {
-        val result: MutableList<Photo> = mutableListOf()
-        for (photo in photoMutableList) {
-            if (photo.original) {
-                result.add(photo)
-            }
-        }
-        PagePhotoFragment.newInstance(result)
+        PagePhotoFragment.newInstance(userList)
     }
 
     val pageAllPhotoFragment: PagePhotoFragment by lazy {
-        PagePhotoFragment.newInstance(photoMutableList)
+        PagePhotoFragment.newInstance((userList + totalList).toMutableList())
     }
 
     override fun getItemCount(): Int {

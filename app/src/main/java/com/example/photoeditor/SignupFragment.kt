@@ -106,37 +106,35 @@ class SignupFragment : Fragment() {
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
                         Log.d(firebaseLogTag, "createUserWithEmail:success")
-                        val user = hashMapOf(
-                            "username" to username,
-                            "email" to email,
-                            "password" to password,
-                            "created_at" to LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                        )
-                        db.collection("Users")
-                            .add(user)
-                            .addOnSuccessListener { documentReference ->
-                                Log.d(firebaseLogTag, "DocumentSnapshot added with ID: ${documentReference.id}")
-                                goMain()
-                            }
-                            .addOnFailureListener { e ->
-                                Log.w(firebaseLogTag, "Error adding document", e)
-                            }
+                        val user = auth.currentUser
+                        if (user != null) {
+                            val userData = hashMapOf(
+                                "created_at" to LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                                "email" to email,
+                                "password" to password,
+                                "photoRefs" to listOf<String>(),
+                                "username" to username
+                            )
+                            db.collection("Users").document(user.uid)
+                                .set(userData)
+                                .addOnSuccessListener {
+                                    Log.d(firebaseLogTag, "User document added with ID: ${user.uid}")
+                                    goMain()
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w(firebaseLogTag, "Error adding user document", e)
+                                }
+                        }
                     } else {
                         Log.w(firebaseLogTag, "createUserWithEmail:failure", task.exception)
-                        val errorMessage = when (task.exception) {
-                            is FirebaseAuthWeakPasswordException -> getString(R.string.error_weak_password)
-                            is FirebaseAuthInvalidCredentialsException -> getString(R.string.error_invalid_email)
-                            is FirebaseAuthUserCollisionException -> getString(R.string.error_email_already_in_use)
-                            is FirebaseNetworkException -> getString(R.string.error_network_request_failed)
-                            else -> getString(R.string.error_unknown)
-                        }
                         Toast.makeText(
                             requireContext(),
-                            errorMessage,
+                            getString(R.string.authentication_failed),
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
                 }
+
         }
         else {
             Toast.makeText(

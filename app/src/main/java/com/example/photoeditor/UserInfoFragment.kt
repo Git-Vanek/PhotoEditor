@@ -51,20 +51,19 @@ class UserInfoFragment : Fragment() {
 
         // Чтение данных
         db.collection("Users")
+            .whereEqualTo("email", cuser?.email)
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
                     Log.d(firebaseLogTag, "${document.id} => ${document.data}")
-                    if (cuser?.email == document.data["email"].toString()) {
-                        // Отображение данных пользователя
-                        binding.textViewUsername.text = document.data["username"].toString()
-                        binding.textViewEmail.text = document.data["email"].toString()
-                        binding.textViewCreatedAt.text = document.data["created_at"].toString()
-                    }
+                    // Отображение данных пользователя
+                    binding.textViewUsername.text = document.getString("username")
+                    binding.textViewEmail.text = document.getString("email")
+                    binding.textViewCreatedAt.text = document.getString("created_at")
                 }
             }
             .addOnFailureListener { exception ->
-                Log.w(firebaseLogTag, getString(R.string.error_getting_documents), exception)
+                Log.w(firebaseLogTag, "Error getting documents", exception)
             }
 
         // Установка обработчика нажатия для кнопки "Назад"
