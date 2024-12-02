@@ -76,8 +76,8 @@ class SettingsFragment : Fragment() {
         binding.spinnerColumns.setSelection(savedColumns - 1)
 
         // Загрузка сохраненного показа дат и установка его в Spinner
-        val savedShowDates = sharedPreferences.getBoolean("show_dates", true)
-        binding.spinnerShowDates.setSelection(if (savedShowDates) 0 else 1)
+        val savedShowDates = sharedPreferences.getBoolean("show_dates", false)
+        binding.spinnerShowDates.setSelection(if (savedShowDates) 1 else 0)
     }
 
     private fun saveSettings() {
@@ -96,9 +96,6 @@ class SettingsFragment : Fragment() {
             apply()
         }
 
-        // Установка темы после сохранения настроек
-        setAppTheme(selectedTheme)
-
         // Подтверждение сохранения
         Toast.makeText(
             context,
@@ -106,8 +103,8 @@ class SettingsFragment : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
 
-        // Возврат
-        back()
+        // Установка темы после сохранения настроек
+        setAppTheme(selectedTheme)
     }
 
     // Метод для установки темы

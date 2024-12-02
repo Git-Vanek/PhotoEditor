@@ -64,6 +64,130 @@ class MainFragment : Fragment() {
         user = Firebase.auth.currentUser
         // Создание вкладок
         getData()
+    }
+
+    // Метод очищения значения из SearchView и сворачиваем его
+    private fun cleanSearchView() {
+        searchView.post {
+            searchView.isIconified = true
+            searchView.clearFocus()
+        }
+    }
+
+    // Метод обновления списков
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getData() {
+        getPhotosForTotal()
+    }
+
+    // Метод получения всех общих фотографий
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getPhotosForTotal() {
+        totalList = mutableListOf()
+        // Чтение данных
+        db.collection("Photos")
+            .whereEqualTo("private", false)
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    Log.d(firebaseLogTag, "Totals - ${document.id} => ${document.data}")
+                    totalList.add(
+                        Photo(
+                            document.getString("created_at").toString(),
+                            document.getBoolean("original") == true,
+                            document.getString("path").toString(),
+                            document.getBoolean("private") == true
+                        )
+                    )
+                }
+                if (user == null) {
+                    createTabs()
+                }
+                else {
+                    getPhotosForUser()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(firebaseLogTag, "Error getting documents", exception)
+            }
+    }
+
+    // Метод получения всех фотографий пользователя
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getPhotosForUser() {
+        userList = mutableListOf()
+        val userRef = db.collection("Users").document(user!!.uid)
+        userRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val photoRefs = document.get("photoRefs") as? List<*>
+                    photoRefs?.forEach { photoId ->
+                        val photoRef = db.collection("Photos").document(photoId.toString())
+                        photoRef.get()
+                            .addOnSuccessListener { photoDocument ->
+                                if (photoDocument != null) {
+                                    Log.d(firebaseLogTag, "Users - ${photoDocument.id} => ${photoDocument.data}")
+                                    userList.add(
+                                        Photo(
+                                            photoDocument.getString("created_at")!!,
+                                            photoDocument.getBoolean("original")!!,
+                                            photoDocument.getString("path")!!,
+                                            photoDocument.getBoolean("private")!!
+                                        )
+                                    )
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(firebaseLogTag, "Error getting photo document", e)
+                            }
+                    }
+                    createTabs()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(firebaseLogTag, "Error getting user document", e)
+            }
+    }
+
+    // Метод отображения вкладок
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createTabs() {
+        // Создаем адаптер для ViewPager2, передавая ему текущий фрагмент и список фотографий
+        adapter = if (user == null) {
+            PhotoPagerAdapter(this, mutableListOf(), totalList, false)
+        } else {
+            PhotoPagerAdapter(this, userList, totalList, true)
+        }
+        // Инициализируем TabLayout из разметки
+        tabLayout = binding.tabLayout
+        // Инициализируем ViewPager2 из разметки
+        viewPager = binding.viewPager
+        // Устанавливаем адаптер для ViewPager2
+        viewPager.adapter = adapter
+        // Создаем TabLayoutMediator для синхронизации TabLayout и ViewPager2
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            // Устанавливаем текст для каждой вкладки в зависимости от позиции
+            tab.text = when (position) {
+                0 -> getString(R.string.general) // Текст для первой вкладки
+                1 -> getString(R.string.my) // Текст для второй вкладки
+                2 -> getString(R.string.all) // Текст для третьей вкладки
+                else -> "" // Текст для других позиций (если есть)
+            }
+        }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
+
+        // Регистрируем обратный вызов для отслеживания изменений страницы в ViewPager2
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            // Этот метод вызывается, когда выбранная страница изменяется
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                // В зависимости от позиции выбранной страницы выполняем соответствующие действия
+                when (position) {
+                    0 -> cleanSearchView()
+                    1 -> cleanSearchView()
+                    2 -> cleanSearchView()
+                }
+            }
+        })
 
         // Настройка SearchView
         searchView = binding.searchView
@@ -138,126 +262,6 @@ class MainFragment : Fragment() {
                 getData()
             }
         }
-    }
-
-    // Метод очищения значения из SearchView и сворачиваем его
-    private fun cleanSearchView() {
-        searchView.post {
-            searchView.isIconified = true
-            searchView.clearFocus()
-        }
-    }
-
-    // Метод обновления списков
-    private fun getData() {
-        getPhotosForTotal()
-    }
-
-    // Метод получения всех общих фотографий
-    private fun getPhotosForTotal() {
-        totalList = mutableListOf()
-        // Чтение данных
-        db.collection("Photos")
-            .whereEqualTo("private", false)
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    Log.d(firebaseLogTag, "Totals - ${document.id} => ${document.data}")
-                    totalList.add(
-                        Photo(
-                            document.getString("created_at").toString(),
-                            document.getBoolean("original") == true,
-                            document.getString("path").toString(),
-                            document.getBoolean("private") == true
-                        )
-                    )
-                }
-                if (user == null) {
-                    createTabs()
-                }
-                else {
-                    getPhotosForUser()
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(firebaseLogTag, "Error getting documents", exception)
-            }
-    }
-
-    // Метод получения всех фотографий пользователя
-    private fun getPhotosForUser() {
-        userList = mutableListOf()
-        val userRef = db.collection("Users").document(user!!.uid)
-        userRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    val photoRefs = document.get("photoRefs") as? List<*>
-                    photoRefs?.forEach { photoId ->
-                        val photoRef = db.collection("Photos").document(photoId.toString())
-                        photoRef.get()
-                            .addOnSuccessListener { photoDocument ->
-                                if (photoDocument != null) {
-                                    Log.d(firebaseLogTag, "Users - ${photoDocument.id} => ${photoDocument.data}")
-                                    userList.add(
-                                        Photo(
-                                            photoDocument.getString("created_at")!!,
-                                            photoDocument.getBoolean("original")!!,
-                                            photoDocument.getString("path")!!,
-                                            photoDocument.getBoolean("private")!!
-                                        )
-                                    )
-                                }
-                            }
-                            .addOnFailureListener { e ->
-                                Log.w(firebaseLogTag, "Error getting photo document", e)
-                            }
-                    }
-                    createTabs()
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.w(firebaseLogTag, "Error getting user document", e)
-            }
-    }
-
-    // Метод отображения вкладок
-    private fun createTabs() {
-        // Создаем адаптер для ViewPager2, передавая ему текущий фрагмент и список фотографий
-        adapter = if (user == null) {
-            PhotoPagerAdapter(this, mutableListOf(), totalList, false)
-        } else {
-            PhotoPagerAdapter(this, userList, totalList, true)
-        }
-        // Инициализируем TabLayout из разметки
-        tabLayout = binding.tabLayout
-        // Инициализируем ViewPager2 из разметки
-        viewPager = binding.viewPager
-        // Устанавливаем адаптер для ViewPager2
-        viewPager.adapter = adapter
-        // Создаем TabLayoutMediator для синхронизации TabLayout и ViewPager2
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            // Устанавливаем текст для каждой вкладки в зависимости от позиции
-            tab.text = when (position) {
-                0 -> getString(R.string.general) // Текст для первой вкладки
-                1 -> getString(R.string.my) // Текст для второй вкладки
-                2 -> getString(R.string.all) // Текст для третьей вкладки
-                else -> "" // Текст для других позиций (если есть)
-            }
-        }.attach() // Присоединяем TabLayoutMediator к TabLayout и ViewPager2
-
-        // Регистрируем обратный вызов для отслеживания изменений страницы в ViewPager2
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            // Этот метод вызывается, когда выбранная страница изменяется
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                // В зависимости от позиции выбранной страницы выполняем соответствующие действия
-                when (position) {
-                    0 -> cleanSearchView()
-                    1 -> cleanSearchView()
-                    2 -> cleanSearchView()
-                }
-            }
-        })
     }
 
     // Метод для отображения информации пользователя

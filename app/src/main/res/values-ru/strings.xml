@@ -74,9 +74,9 @@
         <item>jpg</item>
     </string-array>
     <string-array name="themes">
-        <item>Dark</item>
-        <item>Light</item>
         <item>System</item>
+        <item>Light</item>
+        <item>Dark</item>
     </string-array>
     <string-array name="columns">
         <item>1</item>
@@ -84,8 +84,8 @@
         <item>3</item>
     </string-array>
     <string-array name="show_dates">
-        <item>Yes</item>
         <item>No</item>
+        <item>Yes</item>
     </string-array>
     <string-array name="colors">
         <item>Red</item>

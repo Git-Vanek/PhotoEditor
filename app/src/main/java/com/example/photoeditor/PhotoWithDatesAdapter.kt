@@ -27,8 +27,10 @@ class PhotoWithDatesAdapter(photoAdapter: PhotoAdapter, private val gridCount: I
 
     init {
         // Группировка фотографий по месяцам и году и добавление заголовков дат
-        val groupedPhotos = photoAdapter.dataset.groupBy { it.createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM")) }
-        groupedPhotos.keys.forEach { date ->
+        val groupedPhotos = photoAdapter.dataset.groupBy {
+            it.createdAt.let { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("yyyy-MM")) }
+        }
+        groupedPhotos.keys.sortedDescending().forEach { date ->
             items.add(date) // Добавляем заголовок даты
             groupedPhotos[date]?.let { items.add(it) } // Добавляем фотографии для этой даты
         }
