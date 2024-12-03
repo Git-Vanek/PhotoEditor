@@ -29,6 +29,7 @@ import com.example.photoeditor.databinding.FragmentPagePhotoBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import com.squareup.picasso.Picasso
@@ -108,6 +109,9 @@ class PagePhotoFragment : Fragment() {
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Получение пользователя
+        user = Firebase.auth.currentUser
 
         // Инициализация SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
@@ -194,7 +198,7 @@ class PagePhotoFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             val selectedImageUri = result.data?.data
             if (selectedImageUri != null) {
-                addPhoto(Photo(date, true, selectedImageUri.toString(), user != null))
+                addPhoto(Photo("", date, true, selectedImageUri.toString(), user != null))
             }
         }
     }
@@ -210,7 +214,7 @@ class PagePhotoFragment : Fragment() {
         builder.setView(input)
         builder.setPositiveButton(getString(R.string.ok)) { _, _ ->
             val url = input.text.toString()
-            addPhoto(Photo(date, false, url, user != null))
+            addPhoto(Photo("", date, false, url, user != null))
         }
         builder.setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
             dialog.cancel()
@@ -235,7 +239,10 @@ class PagePhotoFragment : Fragment() {
                 takePicture.launch(photoURI)
             }
         } else {
-            Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.no_camera_app_found),
+                Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -260,7 +267,7 @@ class PagePhotoFragment : Fragment() {
             val photoUri = FileProvider.getUriForFile(requireContext(), "com.example.photoeditor.fileprovider", File(
                 currentPhotoPath.toString()
             ))
-            addPhoto(Photo(date, true, photoUri.toString(), user != null))
+            addPhoto(Photo("", date, true, photoUri.toString(), user != null))
         }
     }
 
@@ -343,6 +350,7 @@ class PagePhotoFragment : Fragment() {
     }
 
     // Метод для удаления элемента
+    @RequiresApi(Build.VERSION_CODES.O)
     fun delete() {
         if (!showDates) {
             val selectedItems = photoAdapter.getSelectedItems()
@@ -357,8 +365,7 @@ class PagePhotoFragment : Fragment() {
                     .setTitle(getString(R.string.confirm_deletion))
                     .setMessage(getString(R.string.want_to_delete))
                     .setPositiveButton(R.string.yes) { _, _ ->
-                        removePhotos(photoAdapter.dataset.filter { it !in selectedItems }.toMutableList())
-                        photoAdapter.clearSelection()
+                        removePhotos(selectedItems)
                     }
                     .setNegativeButton(getString(R.string.no), null)
                     .show()
@@ -374,9 +381,12 @@ class PagePhotoFragment : Fragment() {
     }
 
     // Метод добавления фотографии
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun addPhoto(photo: Photo) {
         val photoRef = db.collection("Photos").document()
+        val photoId = photoRef.id
         val photoData = hashMapOf(
+            "id" to photoId,
             "created_at" to photo.createdAt,
             "original" to photo.original,
             "path" to photo.path,
@@ -387,15 +397,18 @@ class PagePhotoFragment : Fragment() {
             .addOnSuccessListener {
                 if (photo.private) {
                     val userRef = db.collection("Users").document(user!!.uid)
-                    userRef.update("photoRefs", FieldValue.arrayUnion(photoRef.id))
+                    userRef.update("photoRefs", FieldValue.arrayUnion(photoId))
                         .addOnSuccessListener {
                             Log.d(firebaseLogTag, "Photo reference added to user document")
+                            MainActivity.mainFragment.getData()
                         }
                         .addOnFailureListener { e ->
                             Log.w(firebaseLogTag, "Error updating user document", e)
+                            MainActivity.mainFragment.getData()
                         }
                 } else {
                     Log.d(firebaseLogTag, "Photo is public, no reference added to user document")
+                    MainActivity.mainFragment.getData()
                 }
             }
             .addOnFailureListener { e ->
@@ -404,34 +417,38 @@ class PagePhotoFragment : Fragment() {
     }
 
     // Метод удаления выбранных фотографий
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun removePhotos(photos: MutableList<Photo>) {
+        var flag = false
         for (photo in photos) {
-             db.collection("Photos")
-                .whereEqualTo("path", photo.path)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        val photoId = document.id
-                        val photoRef = db.collection("Photos").document(photoId)
-                        photoRef.delete()
-                            .addOnSuccessListener {
-                                val userRef = db.collection("Users").document(user!!.uid)
-                                userRef.update("photoRefs", FieldValue.arrayRemove(photoId))
-                                    .addOnSuccessListener {
-                                        Log.d(firebaseLogTag, "Photo reference removed from user document")
-                                    }
-                                    .addOnFailureListener { e ->
-                                        Log.w(firebaseLogTag, "Error updating user document", e)
-                                    }
-                            }
-                            .addOnFailureListener { e ->
-                                Log.w(firebaseLogTag, "Error deleting photo document", e)
-                            }
-                    }
+            if (!photo.private) {
+                flag = true
+                continue
+            }
+            val photoId = photo.id
+            val photoRef = db.collection("Photos").document(photoId)
+            photoRef.delete()
+                .addOnSuccessListener {
+                    val userRef = db.collection("Users").document(user!!.uid)
+                    userRef.update("photoRefs", FieldValue.arrayRemove(photoId))
+                        .addOnSuccessListener {
+                            Log.d(firebaseLogTag, "Photo reference removed from user document")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(firebaseLogTag, "Error updating user document", e)
+                        }
                 }
                 .addOnFailureListener { e ->
-                    Log.w(firebaseLogTag, "Error getting photo documents", e)
+                    Log.w(firebaseLogTag, "Error deleting photo document", e)
                 }
         }
+        if (flag) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.the_total_photos_cannot_be_deleted),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        MainActivity.mainFragment.getData()
     }
 }

@@ -69,6 +69,8 @@
     <string name="loading">Loading</string>
     <string name="filter_image">Filter image</string>
     <string name="image">Image</string>
+    <string name="the_total_photos_cannot_be_deleted">The total photos cannot be deleted</string>
+    <string name="no_camera_app_found">No camera app found</string>
     <string-array name="image_format">
         <item>png</item>
         <item>jpg</item>

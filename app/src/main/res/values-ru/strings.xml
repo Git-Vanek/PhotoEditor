@@ -69,6 +69,8 @@
     <string name="loading">Загрузка</string>
     <string name="filter_image">Фильтр изображения</string>
     <string name="image">Изображение</string>
+    <string name="the_total_photos_cannot_be_deleted">Нельзя удалить общие фотографии</string>
+    <string name="no_camera_app_found">Камера не нейдена</string>
     <string-array name="image_format">
         <item>png</item>
         <item>jpg</item>

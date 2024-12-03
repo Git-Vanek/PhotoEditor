@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1
+        lateinit var mainFragment: MainFragment
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,12 +23,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Инициализация View Binding
         binding = ActivityMainBinding.inflate(layoutInflater)
+        // Создание экземпляра фрагмента MainFragment
+        mainFragment = MainFragment()
         // Установка макета активности
         setContentView(binding.root)
         // Проверка разрешений
         checkPermissions()
-        // Создание экземпляра фрагмента MainFragment
-        val mainFragment = MainFragment()
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.mainContent, mainFragment)

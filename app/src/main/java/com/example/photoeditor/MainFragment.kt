@@ -76,7 +76,8 @@ class MainFragment : Fragment() {
 
     // Метод обновления списков
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getData() {
+    fun getData() {
+
         getPhotosForTotal()
     }
 
@@ -93,6 +94,7 @@ class MainFragment : Fragment() {
                     Log.d(firebaseLogTag, "Totals - ${document.id} => ${document.data}")
                     totalList.add(
                         Photo(
+                            document.getString("id").toString(),
                             document.getString("created_at").toString(),
                             document.getBoolean("original") == true,
                             document.getString("path").toString(),
@@ -129,10 +131,11 @@ class MainFragment : Fragment() {
                                     Log.d(firebaseLogTag, "Users - ${photoDocument.id} => ${photoDocument.data}")
                                     userList.add(
                                         Photo(
-                                            photoDocument.getString("created_at")!!,
-                                            photoDocument.getBoolean("original")!!,
-                                            photoDocument.getString("path")!!,
-                                            photoDocument.getBoolean("private")!!
+                                            photoDocument.getString("id").toString(),
+                                            photoDocument.getString("created_at").toString(),
+                                            photoDocument.getBoolean("original") == true,
+                                            photoDocument.getString("path").toString(),
+                                            photoDocument.getBoolean("private") == true
                                         )
                                     )
                                 }
@@ -222,15 +225,12 @@ class MainFragment : Fragment() {
         binding.buttonAdd.setOnClickListener {
             if (adapter.pageTotalPhotoFragment.isVisible) {
                 adapter.pageTotalPhotoFragment.add()
-                getData()
             }
             if (adapter.pageMyPhotoFragment.isVisible) {
                 adapter.pageMyPhotoFragment.add()
-                getData()
             }
             if (adapter.pageAllPhotoFragment.isVisible) {
                 adapter.pageAllPhotoFragment.add()
-                getData()
             }
         }
 
@@ -251,15 +251,12 @@ class MainFragment : Fragment() {
         binding.buttonDelete.setOnClickListener {
             if (adapter.pageTotalPhotoFragment.isVisible) {
                 adapter.pageTotalPhotoFragment.delete()
-                getData()
             }
             if (adapter.pageMyPhotoFragment.isVisible) {
                 adapter.pageMyPhotoFragment.delete()
-                getData()
             }
             if (adapter.pageAllPhotoFragment.isVisible) {
                 adapter.pageAllPhotoFragment.delete()
-                getData()
             }
         }
     }

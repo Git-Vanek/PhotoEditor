@@ -132,15 +132,8 @@ class PhotoAdapter(var dataset: MutableList<Photo>, private val context: Context
     override fun getItemCount() = dataset.size
 
     // Метод для получения списка выбранных элементов
-    fun getSelectedItems(): List<Photo> {
+    fun getSelectedItems(): MutableList<Photo> {
         return selectedItems
-    }
-
-    // Метод для очистки
-    fun clearSelection() {
-        selectedItems.clear()
-        notifyDataSetChanged()
-        isSelectionMode = false
     }
 
     // Метод для фильтрации списка фотографий
