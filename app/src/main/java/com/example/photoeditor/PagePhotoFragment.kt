@@ -400,20 +400,26 @@ class PagePhotoFragment : Fragment() {
                     userRef.update("photoRefs", FieldValue.arrayUnion(photoId))
                         .addOnSuccessListener {
                             Log.d(firebaseLogTag, "Photo reference added to user document")
-                            MainActivity.mainFragment.getData()
+                            getDataMain()
                         }
                         .addOnFailureListener { e ->
                             Log.w(firebaseLogTag, "Error updating user document", e)
-                            MainActivity.mainFragment.getData()
+                            getDataMain()
                         }
                 } else {
                     Log.d(firebaseLogTag, "Photo is public, no reference added to user document")
-                    MainActivity.mainFragment.getData()
+                    getDataMain()
                 }
             }
             .addOnFailureListener { e ->
                 Log.w(firebaseLogTag, "Error adding photo document", e)
+                getDataMain()
             }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getDataMain() {
+        MainActivity.mainFragment.getData()
     }
 
     // Метод удаления выбранных фотографий
@@ -449,6 +455,6 @@ class PagePhotoFragment : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
         }
-        MainActivity.mainFragment.getData()
+        getDataMain()
     }
 }
