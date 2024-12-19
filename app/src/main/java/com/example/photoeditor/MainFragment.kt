@@ -77,7 +77,6 @@ class MainFragment : Fragment() {
     // Метод обновления списков
     @RequiresApi(Build.VERSION_CODES.O)
     fun getData() {
-
         getPhotosForTotal()
     }
 

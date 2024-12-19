@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.auth
 
-class SighinFragment : Fragment() {
+class SigningFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentSighinBinding
     // Геттер для переменной binding
@@ -32,12 +32,17 @@ class SighinFragment : Fragment() {
     private lateinit var email: String
     private lateinit var password: String
 
+    // Интерфейс для взаимодействия с активностью
+    interface OnSignInListener {
+        fun onSignIn(email: String, password: String)
+    }
+
     companion object {
         private const val ARG_EMAIL = "name"
         private const val ARG_PASSWORD = "password"
 
-        fun newInstance(email: String, password: String): SighinFragment {
-            val fragment = SighinFragment()
+        fun newInstance(email: String, password: String): SigningFragment {
+            val fragment = SigningFragment()
             val args = Bundle()
             args.putSerializable(ARG_EMAIL, email)
             args.putSerializable(ARG_PASSWORD, password)
@@ -64,7 +69,7 @@ class SighinFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Создание аунтификатора
+        // Создание аутентификатора
         auth = Firebase.auth
 
         // Получение аргументов
@@ -88,6 +93,14 @@ class SighinFragment : Fragment() {
         binding.buttonGuest.setOnClickListener {
             guest()
         }
+    }
+
+    // Функция обновления данных
+    fun updateData(email: String, password: String) {
+        this.email = email
+        this.password = password
+        binding.editEmail.setText(email)
+        binding.editPassword.setText(password)
     }
 
     // Функция для обработки авторизации
@@ -136,16 +149,8 @@ class SighinFragment : Fragment() {
         email = binding.editEmail.text.toString()
         password = binding.editPassword.text.toString()
 
-        // Создание экземпляра фрагмента SignupFragment с передачей переменной photo
-        val signupFragment = SignupFragment.newInstance(email, password)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на SignupFragment
-            .replace(R.id.card, signupFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnSignInListener)?.onSignIn(email, password)
     }
 
     // Функция для обработки входа гостя

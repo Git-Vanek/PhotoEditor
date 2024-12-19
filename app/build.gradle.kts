@@ -41,7 +41,6 @@ android {
 
 dependencies {
     implementation("com.github.yalantis:ucrop:2.2.6")
-    implementation("com.github.CanHub:Android-Image-Cropper:3.1.0")
     implementation("com.google.android.material:material:1.4.0")
     implementation("com.burhanrashid52:photoeditor:3.0.2")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")

@@ -233,11 +233,22 @@ class EditPhotoFragment : Fragment() {
     // Метод для создания файла изображения
     @Throws(IOException::class)
     private fun createImageFile(): File {
+        // Получаем директорию Pictures
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        // Создаем поддиректорию Photos внутри Pictures
+        val photosDir = File(storageDir, "Photos")
+
+        // Убедитесь, что директория существует или создайте её
+        if (!photosDir.exists()) {
+            photosDir.mkdirs()
+        }
+
+        // Создаем временный файл в директории Photos
         return File.createTempFile(
             "img_${System.currentTimeMillis()}_", /* prefix */
             ".$imageFormat", /* suffix */
-            storageDir /* directory */
+            photosDir /* directory */
         )
     }
 
@@ -275,5 +286,4 @@ class EditPhotoFragment : Fragment() {
         val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
         return Uri.parse(path)
     }
-
 }

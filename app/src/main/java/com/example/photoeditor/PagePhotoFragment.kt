@@ -248,11 +248,22 @@ class PagePhotoFragment : Fragment() {
 
     @Throws(Exception::class)
     private fun createImageFile(): File {
+        // Получаем директорию Pictures
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        // Создаем поддиректорию Photos внутри Pictures
+        val photosDir = File(storageDir, "Photos")
+
+        // Убедитесь, что директория существует или создайте её
+        if (!photosDir.exists()) {
+            photosDir.mkdirs()
+        }
+
+        // Создаем временный файл в директории Photos
         return File.createTempFile(
             "img_${System.currentTimeMillis()}_", /* prefix */
             ".$imageFormat", /* suffix */
-            storageDir /* directory */
+            photosDir /* directory */
         ).apply {
             // Сохраняем путь к файлу для последующего использования
             currentPhotoPath = absolutePath
@@ -306,12 +317,26 @@ class PagePhotoFragment : Fragment() {
 
     // Метод для сохранения изображения на устройство
     private fun saveImageToDevice(selectedItem: Photo) {
-        val fragment = requireContext()
+        val fragment = context
         val target = object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 if (bitmap != null) {
                     val fileName = "img_${System.currentTimeMillis()}." + imageFormat
-                    val file = File(fragment.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
+
+                    // Получаем директорию Pictures
+                    val storageDir: File? = fragment?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+                    // Создаем поддиректорию Photos внутри Pictures
+                    val photosDir = File(storageDir, "Photos")
+
+                    // Убедитесь, что директория существует или создайте её
+                    if (!photosDir.exists()) {
+                        photosDir.mkdirs()
+                    }
+
+                    // Создаем файл в директории Photos
+                    val file = File(photosDir, fileName)
+
                     try {
                         val outputStream = FileOutputStream(file)
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
@@ -319,14 +344,14 @@ class PagePhotoFragment : Fragment() {
                         outputStream.close()
                         Toast.makeText(
                             fragment,
-                            getString(R.string.image_saved) + ": " + {file.absolutePath},
+                            requireContext().getString(R.string.image_saved) + ": " + file.absolutePath,
                             Toast.LENGTH_SHORT
                         ).show()
                     } catch (e: IOException) {
                         e.printStackTrace()
                         Toast.makeText(
                             fragment,
-                            getString(R.string.error_saving_image),
+                            requireContext().getString(R.string.error_saving_image),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -336,7 +361,7 @@ class PagePhotoFragment : Fragment() {
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 Toast.makeText(
                     fragment,
-                    getString(R.string.error_loading_image),
+                    requireContext().getString(R.string.error_loading_image),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -425,12 +450,7 @@ class PagePhotoFragment : Fragment() {
     // Метод удаления выбранных фотографий
     @RequiresApi(Build.VERSION_CODES.O)
     private fun removePhotos(photos: MutableList<Photo>) {
-        var flag = false
         for (photo in photos) {
-            if (!photo.private) {
-                flag = true
-                continue
-            }
             val photoId = photo.id
             val photoRef = db.collection("Photos").document(photoId)
             photoRef.delete()
@@ -447,13 +467,6 @@ class PagePhotoFragment : Fragment() {
                 .addOnFailureListener { e ->
                     Log.w(firebaseLogTag, "Error deleting photo document", e)
                 }
-        }
-        if (flag) {
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.the_total_photos_cannot_be_deleted),
-                Toast.LENGTH_LONG
-            ).show()
         }
         getDataMain()
     }

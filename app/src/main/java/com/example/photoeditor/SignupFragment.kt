@@ -38,6 +38,11 @@ class SignupFragment : Fragment() {
     private lateinit var email: String
     private lateinit var password: String
 
+    // Интерфейс для взаимодействия с активностью
+    interface OnSignUpListener {
+        fun onSignUp(email: String, password: String)
+    }
+
     companion object {
         private const val ARG_EMAIL = "name"
         private const val ARG_PASSWORD = "password"
@@ -71,15 +76,15 @@ class SignupFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Создание аунтификатора
+        // Создание аутентификатора
         auth = Firebase.auth
 
         // Получение аргументов
         email = arguments?.getSerializable(ARG_EMAIL).toString()
         password = arguments?.getSerializable(ARG_PASSWORD).toString()
+
         // Установка значений
-        binding.editEmail.setText(email)
-        binding.editPassword.setText(password)
+        setData(email, password)
 
         // Установка обработчика нажатия для кнопки регистрации
         binding.buttonSignUp.setOnClickListener {
@@ -92,13 +97,30 @@ class SignupFragment : Fragment() {
         }
     }
 
+    // Функция обновления значений
+    private fun getData() {
+        username = binding.editUsername.text.toString()
+        email = binding.editEmail.text.toString()
+        password = binding.editPassword.text.toString()
+    }
+
+    // Функция установки значений
+    private fun setData(email: String, password: String) {
+        binding.editEmail.setText(email)
+        binding.editPassword.setText(password)
+    }
+
+    // Функция обновления данных
+    fun updateData(email: String, password: String) {
+        // Установка значений
+        setData(email, password)
+    }
+
     // Функция для обработки регистрации
     @RequiresApi(Build.VERSION_CODES.O)
     private fun signUp() {
         // Обновление значений
-        username = binding.editUsername.text.toString()
-        email = binding.editEmail.text.toString()
-        password = binding.editPassword.text.toString()
+        getData()
 
         // Проверка заполнения
         if (username != "" && email != "" && password != "") {
@@ -154,20 +176,11 @@ class SignupFragment : Fragment() {
 
     // Функция для обработки возврата
     private fun back() {
-        // Получение значений
-        email = binding.editEmail.text.toString()
-        password = binding.editPassword.text.toString()
+        // Обновление значений
+        getData()
 
-        // Создание экземпляра фрагмента SighinFragment с передачей переменной photo
-        val sighinFragment = SighinFragment.newInstance(email, password)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на SighinFragment
-            .replace(R.id.card, sighinFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnSignUpListener)?.onSignUp(email, password)
     }
 
     // Переход на главную активность

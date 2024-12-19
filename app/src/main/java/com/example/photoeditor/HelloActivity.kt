@@ -4,9 +4,13 @@ import com.example.photoeditor.databinding.ActivityHelloBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
-class HelloActivity : AppCompatActivity() {
+class HelloActivity : AppCompatActivity(), SigningFragment.OnSignInListener, SignupFragment.OnSignUpListener {
     // Инициализация переменной для View Binding
     lateinit var binding: ActivityHelloBinding
+
+    // Создание экземпляров фрагментов
+    private lateinit var signingFragment: SigningFragment
+    private lateinit var signupFragment: SignupFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Установка темы для активности
@@ -18,15 +22,38 @@ class HelloActivity : AppCompatActivity() {
         // Установка макета активности
         setContentView(binding.root)
 
-        // Создание экземпляра фрагмента AutorisationFragment с передачей переменной photo
-        val sighinFragment = SighinFragment.newInstance("", "")
+        // Инициализация фрагментов
+        signingFragment = SigningFragment.newInstance("", "")
+        signupFragment = SignupFragment.newInstance("", "")
+
         // Начало транзакции фрагмента
         supportFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на SighinFragment
-            .replace(R.id.card, sighinFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
+            // Добавление фрагментов в контейнер
+            .add(R.id.card, signingFragment)
+            .add(R.id.card, signupFragment)
+            // Скрытие второго фрагмента
+            .hide(signupFragment)
             // Завершение транзакции
+            .commit()
+    }
+
+    override fun onSignIn(email: String, password: String) {
+        // Передача данных в SignupFragment
+        signupFragment.updateData(email, password)
+        // Переключение на SignupFragment
+        supportFragmentManager.beginTransaction()
+            .hide(signingFragment)
+            .show(signupFragment)
+            .commit()
+    }
+
+    override fun onSignUp(email: String, password: String) {
+        // Передача данных в SighingFragment
+        signingFragment.updateData(email, password)
+        // Переключение на SighingFragment
+        supportFragmentManager.beginTransaction()
+            .hide(signupFragment)
+            .show(signingFragment)
             .commit()
     }
 }
