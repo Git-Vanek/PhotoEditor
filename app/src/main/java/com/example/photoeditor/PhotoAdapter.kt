@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -139,7 +140,27 @@ class PhotoAdapter(var dataset: MutableList<Photo>, private val context: Context
 
     // Метод для фильтрации списка фотографий
     fun filterList(filteredList: MutableList<Photo>) {
+        val oldList = dataset
+        val diffResult = DiffUtil.calculateDiff(PhotoDiffCallback(oldList, filteredList))
         dataset = filteredList
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
+    }
+}
+
+class PhotoDiffCallback(
+    private val oldList: List<Photo>,
+    private val newList: List<Photo>
+) : DiffUtil.Callback() {
+
+    override fun getOldListSize(): Int = oldList.size
+
+    override fun getNewListSize(): Int = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition].id == newList[newItemPosition].id
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }
