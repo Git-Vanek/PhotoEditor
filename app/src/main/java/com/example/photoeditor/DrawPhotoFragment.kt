@@ -144,14 +144,14 @@ class DrawPhotoFragment : Fragment() {
             back()
         }
 
-        // Установка обработчика нажатия для кнопки отката изменения
+        // Установка обработчика нажатия для кнопки назад
         binding.buttonEditBack.setOnClickListener {
-            backBrush()
+            editBack()
         }
 
-        // Установка обработчика нажатия для кнопки отката отката изменения
+        // Установка обработчика нажатия для кнопки вперед
         binding.buttonEditForvard.setOnClickListener {
-            editForvard()
+            editForward()
         }
 
         // Установка обработчика нажатия для кнопки сохранения
@@ -231,13 +231,13 @@ class DrawPhotoFragment : Fragment() {
             .commit()
     }
 
-    // Метод отката изменения
-    private fun backBrush() {
+    // Метод отмены изменения
+    private fun editBack() {
         photoEditor.undo()
     }
 
-    // Метод отката отката изменения
-    private fun editForvard() {
+    // Метод возврата изменения
+    private fun editForward() {
         photoEditor.redo()
     }
 
