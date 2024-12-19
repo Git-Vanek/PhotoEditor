@@ -44,14 +44,14 @@ class UserInfoFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Создание аунтификатора
+        // Создание аутентификатора
         auth = Firebase.auth
         // Получение пользователя
-        val cuser = Firebase.auth.currentUser
+        val user = Firebase.auth.currentUser
 
         // Чтение данных
         db.collection("Users")
-            .whereEqualTo("email", cuser?.email)
+            .whereEqualTo("email", user?.email)
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {

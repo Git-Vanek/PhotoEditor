@@ -30,7 +30,7 @@ class MainFragment : Fragment() {
     private var user: FirebaseUser? = null
     private val firebaseLogTag: String = "Firebase_Logs"
 
-    // Списоки фотографий
+    // Списки фотографий
     private lateinit var userList: MutableList<Photo>
     private lateinit var totalList: MutableList<Photo>
 

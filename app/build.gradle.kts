@@ -6,15 +6,16 @@ plugins {
 
 android {
     namespace = "com.example.photoeditor"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         viewBinding = true
     }
+
     defaultConfig {
         applicationId = "com.example.photoeditor"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -30,10 +31,12 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -41,14 +44,14 @@ android {
 
 dependencies {
     implementation("com.github.yalantis:ucrop:2.2.6")
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("com.burhanrashid52:photoeditor:3.0.2")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.squareup.picasso:picasso:2.71828")
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("com.google.firebase:firebase-firestore:25.1.1")
     implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
     testImplementation("junit:junit:4.13.2")

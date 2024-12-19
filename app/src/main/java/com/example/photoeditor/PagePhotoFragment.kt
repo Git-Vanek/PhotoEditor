@@ -59,10 +59,10 @@ class PagePhotoFragment : Fragment() {
 
     // Переменные параметров
     private var imageFormat: String = "jpg"
-    private var gridCounnt: Int = 2
+    private var gridCount: Int = 2
     private var showDates: Boolean = false
 
-    // Переменая хранения пути для сделанной фотографии
+    // Переменная хранения пути для сделанной фотографии
     private var currentPhotoPath: String? = null
 
     // Переменные firebase
@@ -87,7 +87,10 @@ class PagePhotoFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Получение списка
         arguments?.let {
+            @Suppress("UNCHECKED_CAST")
             photoList = it.getSerializable(ARG_PHOTO_LIST) as MutableList<Photo>
         }
     }
@@ -117,7 +120,7 @@ class PagePhotoFragment : Fragment() {
         sharedPreferences = requireContext().getSharedPreferences(settings, Context.MODE_PRIVATE)
         // Получение параметров
         imageFormat = sharedPreferences.getString("image_format", "jpg").toString()
-        gridCounnt = sharedPreferences.getInt("columns", 2)
+        gridCount = sharedPreferences.getInt("columns", 2)
         showDates = sharedPreferences.getBoolean("show_dates", false)
 
         // Инициализация RecyclerView
@@ -127,14 +130,14 @@ class PagePhotoFragment : Fragment() {
         }
         if (showDates) {
             // Установка RecyclerView с датами
-            photoWithDatesAdapter = PhotoWithDatesAdapter(photoAdapter, gridCounnt, context)
+            photoWithDatesAdapter = PhotoWithDatesAdapter(photoAdapter, gridCount, context)
             rv.adapter = photoWithDatesAdapter
             rv.layoutManager = LinearLayoutManager(context)
         }
         else {
             // Установка RecyclerView без дат
             rv.adapter = photoAdapter
-            rv.layoutManager = GridLayoutManager(context, gridCounnt)
+            rv.layoutManager = GridLayoutManager(context, gridCount)
         }
     }
 

@@ -114,7 +114,8 @@ class PhotoAdapter(var dataset: MutableList<Photo>, private val context: Context
         // Обработка долгого нажатия на изображение для переключения режима выбора
         viewHolder.image.setOnLongClickListener {
             isSelectionMode = !isSelectionMode
-            notifyDataSetChanged()
+            // Обновление только текущего элемента
+            notifyItemChanged(position)
             true
         }
 
