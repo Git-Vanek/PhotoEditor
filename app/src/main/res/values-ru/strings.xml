@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">PhotoEditor</string>
-    <string name="signin">Войти</string>
+    <string name="signing">Войти</string>
     <string name="signup">Зарегистрироваться</string>
     <string name="back">Назад</string>
     <string name="password">Пароль</string>
@@ -20,8 +20,8 @@
     <string name="permission_to_write">Разрешение на запись в память устройства не предоставлено</string>
     <string name="settings_saved">Настройки сохранены</string>
     <string name="photo_edit">Редактирование фото</string>
-    <string name="editback">РедактироватьНазад</string>
-    <string name="editforvard">РедактироватьВперед</string>
+    <string name="backEdit">РедактироватьНазад</string>
+    <string name="forwardEdit">РедактироватьВперед</string>
     <string name="crop">Обрезать</string>
     <string name="photo_filter">Фильтр фото</string>
     <string name="photo_draw">Рисование на фото</string>
@@ -69,7 +69,6 @@
     <string name="loading">Загрузка</string>
     <string name="filter_image">Фильтр изображения</string>
     <string name="image">Изображение</string>
-    <string name="the_total_photos_cannot_be_deleted">Нельзя удалить общие фотографии</string>
     <string name="no_camera_app_found">Камера не нейдена</string>
     <string-array name="image_format">
         <item>png</item>

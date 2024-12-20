@@ -106,12 +106,12 @@ class DrawPhotoFragment : Fragment() {
         }
 
         // Установка обработчика нажатия для кнопки назад
-        binding.buttonEditBack.setOnClickListener {
+        binding.buttonBackEdit.setOnClickListener {
             editBack()
         }
 
         // Установка обработчика нажатия для кнопки вперед
-        binding.buttonEditForvard.setOnClickListener {
+        binding.buttonForwardEdit.setOnClickListener {
             editForward()
         }
 
