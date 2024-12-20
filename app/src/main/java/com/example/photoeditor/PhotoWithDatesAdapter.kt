@@ -27,7 +27,7 @@ class PhotoWithDatesAdapter(photoAdapter: PhotoAdapter, private val gridCount: I
 
     init {
         // Группировка фотографий по месяцам и году и добавление заголовков дат
-        val groupedPhotos = photoAdapter.dataset.groupBy {
+        val groupedPhotos = photoAdapter.dataset.groupBy { it ->
             it.createdAt.let { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("yyyy-MM")) }
         }
         groupedPhotos.keys.sortedDescending().forEach { date ->
@@ -47,6 +47,7 @@ class PhotoWithDatesAdapter(photoAdapter: PhotoAdapter, private val gridCount: I
         when (getItemViewType(position)) {
             VIEW_TYPE_DATE_HEADER -> {
                 val date = items[position] as String
+                @Suppress("UNCHECKED_CAST")
                 val photos = items[position + 1] as List<Photo>
                 (holder as DateHeaderViewHolder).bind(date, photos)
             }

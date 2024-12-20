@@ -75,6 +75,11 @@ class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
     // Геттер для переменной binding
     private val binding get() = _binding
 
+    // Интерфейс для взаимодействия с активностью
+    interface OnFilterPhotoListener {
+        fun onFilterPhoto(photo: Photo)
+    }
+
     companion object {
         private const val ARG_PHOTO = "photo"
 
@@ -116,50 +121,7 @@ class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
             .setPinchTextScalable(true)
             .build()
-        // Отображение изображения
-        if (photo.original) {
-            // Загрузка изображения с устройства
-            Picasso.get()
-                .load(Uri.parse(photo.path))
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(object : Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        bitmap?.let {
-                            scaleBitmapToFitView(it, photoEditorView)
-                        }
-                    }
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        // Обработка ошибки загрузки изображения
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        // Обработка подготовки загрузки изображения
-                    }
-                })
-        } else {
-            // Загрузка изображения из интернета
-            Picasso.get()
-                .load(photo.path)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(object : Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        bitmap?.let {
-                            scaleBitmapToFitView(it, photoEditorView)
-                        }
-                    }
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        // Обработка ошибки загрузки изображения
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        // Обработка подготовки загрузки изображения
-                    }
-                })
-        }
+        setPhoto()
 
         val rv = binding.recyclerView
         filterAdapter = FilterAdapter(mPairList, this)
@@ -214,18 +176,64 @@ class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
         })
     }
 
+    // Функция обновления данных
+    fun updateData(photo: Photo) {
+        this@FilterPhotoFragment.photo = photo
+        setPhoto()
+    }
+
+    // Метод отображения изображения
+    private fun setPhoto() {
+        // Отображение изображения
+        if (photo.original) {
+            // Загрузка изображения с устройства
+            Picasso.get()
+                .load(Uri.parse(photo.path))
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(object : Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bitmap?.let {
+                            scaleBitmapToFitView(it, photoEditorView)
+                        }
+                    }
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        // Обработка ошибки загрузки изображения
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                        // Обработка подготовки загрузки изображения
+                    }
+                })
+        } else {
+            // Загрузка изображения из интернета
+            Picasso.get()
+                .load(photo.path)
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(object : Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bitmap?.let {
+                            scaleBitmapToFitView(it, photoEditorView)
+                        }
+                    }
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        // Обработка ошибки загрузки изображения
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                        // Обработка подготовки загрузки изображения
+                    }
+                })
+        }
+    }
+
     // Метод возвращения на просмотр фотографии
     private fun back() {
-        // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
-        val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на ViewPhotoFragment
-            .replace(R.id.imageContent, viewPhotoFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnFilterPhotoListener)?.onFilterPhoto(photo)
     }
 
     // Метод сохранения
@@ -240,11 +248,20 @@ class FilterPhotoFragment : Fragment(), FilterAdapter.OnFilterSelectedListener {
             saveSettings,
             object : PhotoEditor.OnSaveListener {
                 override fun onSuccess(imagePath: String) {
-                    Toast.makeText(requireContext(), getString(R.string.image_saved), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.image_saved),
+                        Toast.LENGTH_SHORT)
+                        .show()
+                    back()
                 }
 
                 override fun onFailure(exception: Exception) {
-                    Toast.makeText(requireContext(), getString(R.string.error_saving_image), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_saving_image),
+                        Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         )

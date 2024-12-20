@@ -75,9 +75,9 @@ class SigningFragment : Fragment() {
         // Получение аргументов
         email = arguments?.getSerializable(ARG_EMAIL).toString()
         password = arguments?.getSerializable(ARG_PASSWORD).toString()
+
         // Установка значений
-        binding.editEmail.setText(email)
-        binding.editPassword.setText(password)
+        setData(email, password)
 
         // Установка обработчика нажатия для кнопки авторизации
         binding.buttonSignIn.setOnClickListener {
@@ -95,19 +95,28 @@ class SigningFragment : Fragment() {
         }
     }
 
-    // Функция обновления данных
-    fun updateData(email: String, password: String) {
-        this.email = email
-        this.password = password
+    // Функция обновления значений
+    private fun getData() {
+        email = binding.editEmail.text.toString()
+        password = binding.editPassword.text.toString()
+    }
+
+    // Функция установки значений
+    private fun setData(email: String, password: String) {
         binding.editEmail.setText(email)
         binding.editPassword.setText(password)
+    }
+
+    // Функция обновления данных
+    fun updateData(email: String, password: String) {
+        // Установка значений
+        setData(email, password)
     }
 
     // Функция для обработки авторизации
     private fun signIn() {
         // Обновление значений
-        email = binding.editEmail.text.toString()
-        password = binding.editPassword.text.toString()
+        getData()
 
         // Проверка заполнения
         if (email != "" && password != "") {
@@ -145,9 +154,8 @@ class SigningFragment : Fragment() {
 
     // Функция для обработки регистрации
     private fun signUp() {
-        // Получение значений
-        email = binding.editEmail.text.toString()
-        password = binding.editPassword.text.toString()
+        // Обновление значений
+        getData()
 
         // Передача данных в активность
         (activity as? OnSignInListener)?.onSignIn(email, password)

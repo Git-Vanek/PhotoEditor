@@ -51,6 +51,11 @@ class EditPhotoFragment : Fragment() {
     // Геттер для переменной binding
     private val binding get() = _binding
 
+    // Интерфейс для взаимодействия с активностью
+    interface OnEditPhotoListener {
+        fun onEditPhoto(photo: Photo)
+    }
+
     companion object {
         private const val ARG_PHOTO = "photo"
 
@@ -92,6 +97,65 @@ class EditPhotoFragment : Fragment() {
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
             .setPinchTextScalable(true)
             .build()
+        setPhoto()
+
+        // Установка обработчика нажатия для кнопки возврата
+        binding.buttonBack.setOnClickListener {
+            back()
+        }
+
+        // Установка обработчика нажатия для кнопки сохранения
+        binding.buttonSave.setOnClickListener {
+            save()
+        }
+
+        // Установка обработчика нажатия для кнопки обрезания
+        binding.buttonCrop.setOnClickListener {
+            crop()
+        }
+    }
+
+    // Метод масштабирования изображения
+    private fun scaleBitmapToFitView(bitmap: Bitmap, view: PhotoEditorView) {
+        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val viewWidth = view.width
+                val viewHeight = view.height
+
+                if (viewWidth != 0 && viewHeight != 0) {
+                    val bitmapWidth = bitmap.width
+                    val bitmapHeight = bitmap.height
+
+                    val scaleWidth = viewWidth.toFloat() / bitmapWidth
+                    val scaleHeight = viewHeight.toFloat() / bitmapHeight
+                    val scale = scaleWidth.coerceAtMost(scaleHeight)
+
+                    val matrix = Matrix()
+                    matrix.postScale(scale, scale)
+
+                    // Центрирование изображения
+                    val scaledBitmapWidth = (bitmapWidth * scale).toInt()
+                    val scaledBitmapHeight = (bitmapHeight * scale).toInt()
+                    val translateX = (viewWidth - scaledBitmapWidth) / 2
+                    val translateY = (viewHeight - scaledBitmapHeight) / 2
+                    matrix.postTranslate(translateX.toFloat(), translateY.toFloat())
+
+                    val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true)
+                    photoEditorView.source.setImageBitmap(scaledBitmap)
+                }
+            }
+        })
+    }
+
+    // Функция обновления данных
+    fun updateData(photo: Photo) {
+        this@EditPhotoFragment.photo = photo
+        setPhoto()
+    }
+
+    // Метод отображения изображения
+    private fun setPhoto() {
         // Отображение изображения
         if (photo.original) {
             // Загрузка изображения с устройства
@@ -136,68 +200,12 @@ class EditPhotoFragment : Fragment() {
                     }
                 })
         }
-
-        // Установка обработчика нажатия для кнопки возврата
-        binding.buttonBack.setOnClickListener {
-            back()
-        }
-
-        // Установка обработчика нажатия для кнопки сохранения
-        binding.buttonSave.setOnClickListener {
-            save()
-        }
-
-        // Установка обработчика нажатия для кнопки обрезания
-        binding.buttonCrop.setOnClickListener {
-            crop()
-        }
     }
 
     // Метод возвращения на просмотр фотографии
     private fun back() {
-        // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
-        val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на ViewPhotoFragment
-            .replace(R.id.imageContent, viewPhotoFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
-    }
-
-    // Метод масштабирования изображения
-    private fun scaleBitmapToFitView(bitmap: Bitmap, view: PhotoEditorView) {
-        view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                val viewWidth = view.width
-                val viewHeight = view.height
-
-                if (viewWidth != 0 && viewHeight != 0) {
-                    val bitmapWidth = bitmap.width
-                    val bitmapHeight = bitmap.height
-
-                    val scaleWidth = viewWidth.toFloat() / bitmapWidth
-                    val scaleHeight = viewHeight.toFloat() / bitmapHeight
-                    val scale = scaleWidth.coerceAtMost(scaleHeight)
-
-                    val matrix = Matrix()
-                    matrix.postScale(scale, scale)
-
-                    // Центрирование изображения
-                    val scaledBitmapWidth = (bitmapWidth * scale).toInt()
-                    val scaledBitmapHeight = (bitmapHeight * scale).toInt()
-                    val translateX = (viewWidth - scaledBitmapWidth) / 2
-                    val translateY = (viewHeight - scaledBitmapHeight) / 2
-                    matrix.postTranslate(translateX.toFloat(), translateY.toFloat())
-
-                    val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth, bitmapHeight, matrix, true)
-                    photoEditorView.source.setImageBitmap(scaledBitmap)
-                }
-            }
-        })
+        // Передача данных в активность
+        (activity as? OnEditPhotoListener)?.onEditPhoto(photo)
     }
 
     // Метод сохранения
@@ -217,6 +225,7 @@ class EditPhotoFragment : Fragment() {
                         getString(R.string.image_saved),
                         Toast.LENGTH_SHORT)
                         .show()
+                    back()
                 }
 
                 override fun onFailure(exception: Exception) {

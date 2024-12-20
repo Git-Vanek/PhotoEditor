@@ -14,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.core.content.ContextCompat
 import com.example.photoeditor.databinding.FragmentDrawPhotoBinding
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -51,6 +50,11 @@ class DrawPhotoFragment : Fragment() {
 
     // Геттер для переменной binding
     private val binding get() = _binding
+
+    // Интерфейс для взаимодействия с активностью
+    interface OnDrawPhotoListener {
+        fun onDrawPhoto(photo: Photo)
+    }
 
     companion object {
         private const val ARG_PHOTO = "photo"
@@ -94,50 +98,7 @@ class DrawPhotoFragment : Fragment() {
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
             .setPinchTextScalable(true)
             .build()
-        // Отображение изображения
-        if (photo.original) {
-            // Загрузка изображения с устройства
-            Picasso.get()
-                .load(Uri.parse(photo.path))
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(object : Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        bitmap?.let {
-                            scaleBitmapToFitView(it, photoEditorView)
-                        }
-                    }
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        // Обработка ошибки загрузки изображения
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        // Обработка подготовки загрузки изображения
-                    }
-                })
-        } else {
-            // Загрузка изображения из интернета
-            Picasso.get()
-                .load(photo.path)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(object : Target {
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        bitmap?.let {
-                            scaleBitmapToFitView(it, photoEditorView)
-                        }
-                    }
-
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                        // Обработка ошибки загрузки изображения
-                    }
-
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                        // Обработка подготовки загрузки изображения
-                    }
-                })
-        }
+        setPhoto()
 
         // Установка обработчика нажатия для кнопки возврата
         binding.buttonBack.setOnClickListener {
@@ -217,18 +178,64 @@ class DrawPhotoFragment : Fragment() {
         })
     }
 
+    // Функция обновления данных
+    fun updateData(photo: Photo) {
+        this@DrawPhotoFragment.photo = photo
+        setPhoto()
+    }
+
+    // Метод отображения изображения
+    private fun setPhoto() {
+        // Отображение изображения
+        if (photo.original) {
+            // Загрузка изображения с устройства
+            Picasso.get()
+                .load(Uri.parse(photo.path))
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(object : Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bitmap?.let {
+                            scaleBitmapToFitView(it, photoEditorView)
+                        }
+                    }
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        // Обработка ошибки загрузки изображения
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                        // Обработка подготовки загрузки изображения
+                    }
+                })
+        } else {
+            // Загрузка изображения из интернета
+            Picasso.get()
+                .load(photo.path)
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(object : Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        bitmap?.let {
+                            scaleBitmapToFitView(it, photoEditorView)
+                        }
+                    }
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                        // Обработка ошибки загрузки изображения
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                        // Обработка подготовки загрузки изображения
+                    }
+                })
+        }
+    }
+
     // Метод возвращения на просмотр фотографии
     private fun back() {
-        // Создание экземпляра фрагмента ViewPhotoFragment с передачей переменной photo
-        val viewPhotoFragment = ViewPhotoFragment.newInstance(photo)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на ViewPhotoFragment
-            .replace(R.id.imageContent, viewPhotoFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnDrawPhotoListener)?.onDrawPhoto(photo)
     }
 
     // Метод отмены изменения
@@ -253,11 +260,20 @@ class DrawPhotoFragment : Fragment() {
             saveSettings,
             object : PhotoEditor.OnSaveListener {
                 override fun onSuccess(imagePath: String) {
-                    Toast.makeText(requireContext(), getString(R.string.image_saved), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.image_saved),
+                        Toast.LENGTH_SHORT)
+                        .show()
+                    back()
                 }
 
                 override fun onFailure(exception: Exception) {
-                    Toast.makeText(requireContext(), getString(R.string.error_saving_image), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_saving_image),
+                        Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         )
@@ -336,18 +352,18 @@ class DrawPhotoFragment : Fragment() {
     // Метод обновления фона кнопки кисти
     private fun updateBrushButtonBackground() {
         if (flagBrush) {
-            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.onBackground))
+            binding.buttonBrush.setImageResource(R.drawable.ic_brush_sec)
         } else {
-            binding.buttonBrush.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
+            binding.buttonBrush.setImageResource(R.drawable.ic_brush)
         }
     }
 
     // Метод обновления фона кнопки ластика
     private fun updateEraserButtonBackground() {
         if (flagEraser) {
-            binding.buttonEraser.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.onBackground))
+            binding.buttonEraser.setImageResource(R.drawable.ic_eraser_sec)
         } else {
-            binding.buttonEraser.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
+            binding.buttonEraser.setImageResource(R.drawable.ic_eraser)
         }
     }
 }

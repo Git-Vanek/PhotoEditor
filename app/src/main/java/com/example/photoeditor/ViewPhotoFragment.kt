@@ -14,9 +14,18 @@ import com.squareup.picasso.Picasso
 class ViewPhotoFragment : Fragment() {
     // Инициализация переменной для View Binding
     private lateinit var _binding: FragmentViewPhotoBinding
+
+    private lateinit var photo: Photo
+
+    // Интерфейс для взаимодействия с активностью
+    interface OnViewPhotoListener {
+        fun onViewPhotoDraw(photo: Photo)
+        fun onViewPhotoFilter(photo: Photo)
+        fun onViewPhotoEdit(photo: Photo)
+    }
+
     // Геттер для переменной binding
     private val binding get() = _binding
-    private lateinit var photo: Photo
 
     companion object {
         private const val ARG_PHOTO = "photo"
@@ -86,6 +95,11 @@ class ViewPhotoFragment : Fragment() {
         }
     }
 
+    // Функция обновления данных
+    fun updateData(photo: Photo) {
+        this@ViewPhotoFragment.photo = photo
+    }
+
     private fun back() {
         val intent = Intent(context, MainActivity::class.java)
         startActivity(intent)
@@ -93,43 +107,19 @@ class ViewPhotoFragment : Fragment() {
 
     // Функция для обработки рисования
     private fun draw() {
-        // Создание экземпляра фрагмента DrawPhotoFragment с передачей переменной photo
-        val drawPhotoFragment = DrawPhotoFragment.newInstance(photo)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на DrawPhotoFragment
-            .replace(R.id.imageContent, drawPhotoFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnViewPhotoListener)?.onViewPhotoDraw(photo)
     }
 
     // Функция для обработки фильтрации
     private fun filter() {
-        // Создание экземпляра фрагмента FilterPhotoFragment с передачей переменной photo
-        val filterPhotoFragment = FilterPhotoFragment.newInstance(photo)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на FilterPhotoFragment
-            .replace(R.id.imageContent, filterPhotoFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnViewPhotoListener)?.onViewPhotoFilter(photo)
     }
 
     // Функция для обработки редактирования
     private fun edit() {
-        // Создание экземпляра фрагмента EditPhotoFragment с передачей переменной photo
-        val editPhotoFragment = EditPhotoFragment.newInstance(photo)
-        // Начало транзакции фрагмента
-        parentFragmentManager.beginTransaction()
-            // Замена текущего фрагмента на EditPhotoFragment
-            .replace(R.id.imageContent, editPhotoFragment)
-            // Добавление транзакции в стек обратного вызова
-            .addToBackStack(null)
-            // Завершение транзакции
-            .commit()
+        // Передача данных в активность
+        (activity as? OnViewPhotoListener)?.onViewPhotoEdit(photo)
     }
 }
