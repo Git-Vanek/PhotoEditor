@@ -297,15 +297,7 @@ class PagePhotoFragment : Fragment() {
                 ).show()
             } else {
                 for (selectedItem in selectedItems) {
-                    if (!selectedItem.original) {
-                        saveImageToDevice(selectedItem)
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.the_photo_is_already_on_your_device),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    saveImageToDevice(selectedItem)
                 }
             }
         }
@@ -432,16 +424,13 @@ class PagePhotoFragment : Fragment() {
                         }
                         .addOnFailureListener { e ->
                             Log.w(firebaseLogTag, "Error updating user document", e)
-                            getDataMain()
                         }
                 } else {
                     Log.d(firebaseLogTag, "Photo is public, no reference added to user document")
-                    getDataMain()
                 }
             }
             .addOnFailureListener { e ->
                 Log.w(firebaseLogTag, "Error adding photo document", e)
-                getDataMain()
             }
     }
 
@@ -462,6 +451,7 @@ class PagePhotoFragment : Fragment() {
                     userRef.update("photoRefs", FieldValue.arrayRemove(photoId))
                         .addOnSuccessListener {
                             Log.d(firebaseLogTag, "Photo reference removed from user document")
+                            getDataMain()
                         }
                         .addOnFailureListener { e ->
                             Log.w(firebaseLogTag, "Error updating user document", e)
@@ -471,6 +461,5 @@ class PagePhotoFragment : Fragment() {
                     Log.w(firebaseLogTag, "Error deleting photo document", e)
                 }
         }
-        getDataMain()
     }
 }
