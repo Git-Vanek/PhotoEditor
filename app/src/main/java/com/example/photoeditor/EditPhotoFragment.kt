@@ -29,6 +29,7 @@ import java.io.File
 import java.io.IOException
 import com.yalantis.ucrop.UCrop
 import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
 
 @Suppress("DEPRECATION")
 class EditPhotoFragment : Fragment() {
@@ -261,7 +262,6 @@ class EditPhotoFragment : Fragment() {
         )
     }
 
-    // Метод обрезания
     private fun crop() {
         val bitmap = photoEditorView.source.drawable.toBitmap()
         val uri = getImageUri(bitmap)
@@ -290,9 +290,16 @@ class EditPhotoFragment : Fragment() {
     }
 
     private fun getImageUri(bitmap: Bitmap): Uri {
+        val tempFile = File(requireContext().cacheDir, "temp_image.jpg")
         val bytes = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
-        return Uri.parse(path)
+        val byteArray = bytes.toByteArray()
+
+        val fos = FileOutputStream(tempFile)
+        fos.write(byteArray)
+        fos.flush()
+        fos.close()
+
+        return Uri.fromFile(tempFile)
     }
 }
